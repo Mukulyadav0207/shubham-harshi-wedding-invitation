@@ -1,0 +1,459 @@
+.ganeshaIntro {
+  position: absolute;
+  z-index: 25;
+  inset: 0;
+  display: grid;
+  place-items: center;
+  overflow: hidden;
+  pointer-events: none;
+  opacity: 0;
+  isolation: isolate;
+  background: #1c120d;
+}
+
+.goldenLight {
+  position: absolute;
+  z-index: 1;
+  inset: -25%;
+  pointer-events: none;
+  opacity: 0;
+  background:
+    radial-gradient(
+      ellipse 38% 34% at 50% 49%,
+      rgba(255, 252, 225, 0.98) 0%,
+      rgba(255, 240, 189, 0.9) 24%,
+      rgba(255, 220, 140, 0.56) 46%,
+      rgba(244, 192, 96, 0.18) 63%,
+      transparent 78%
+    ),
+    linear-gradient(rgba(255, 250, 226, 0.95), rgba(255, 244, 208, 0.95));
+  filter: blur(10px);
+  transform: scale(0.72);
+  transform-origin: 50% 50%;
+}
+
+.ambientBackground {
+  position: absolute;
+  z-index: 0;
+  inset: 0;
+  background:
+    radial-gradient(
+      ellipse 42% 48% at 50% 50%,
+      rgba(255, 241, 198, 0.58),
+      rgba(242, 208, 142, 0.18) 44%,
+      transparent 74%
+    ),
+    linear-gradient(125deg, #24170f 0%, #6e4524 48%, #1c120d 100%);
+}
+
+.ambientBackground::after {
+  position: absolute;
+  inset: -8%;
+  content: "";
+  opacity: 0.2;
+  background: url("/assets/images/ganesha/ganesha-bg-page.webp") center / cover
+    no-repeat;
+  filter: blur(22px) saturate(0.7);
+}
+
+.ambientParticles {
+  position: absolute;
+  z-index: 1;
+  inset: 0;
+  overflow: hidden;
+  pointer-events: none;
+}
+
+.ambientParticles span {
+  position: absolute;
+  width: 3px;
+  aspect-ratio: 1;
+  border-radius: 50%;
+  opacity: 0;
+  background: rgba(255, 226, 159, 0.9);
+  box-shadow: 0 0 8px rgba(248, 192, 91, 0.36);
+  animation: particle-drift 12s ease-in-out infinite;
+}
+
+.ambientParticles span:nth-child(1) {
+  top: 88%;
+  left: 8%;
+  animation-delay: -2s;
+}
+.ambientParticles span:nth-child(2) {
+  top: 76%;
+  left: 18%;
+  width: 2px;
+  animation-delay: -8s;
+  animation-duration: 16s;
+}
+.ambientParticles span:nth-child(3) {
+  top: 94%;
+  left: 29%;
+  width: 4px;
+  animation-delay: -5s;
+  animation-duration: 13s;
+}
+.ambientParticles span:nth-child(4) {
+  top: 82%;
+  left: 39%;
+  width: 2px;
+  animation-delay: -10s;
+  animation-duration: 17s;
+}
+.ambientParticles span:nth-child(5) {
+  top: 92%;
+  left: 51%;
+  animation-delay: -3s;
+}
+.ambientParticles span:nth-child(6) {
+  top: 73%;
+  left: 62%;
+  width: 2px;
+  animation-delay: -7s;
+  animation-duration: 15s;
+}
+.ambientParticles span:nth-child(7) {
+  top: 91%;
+  left: 72%;
+  width: 4px;
+  animation-delay: -11s;
+  animation-duration: 14s;
+}
+.ambientParticles span:nth-child(8) {
+  top: 84%;
+  left: 87%;
+  width: 2px;
+  animation-delay: -4s;
+  animation-duration: 18s;
+}
+.ambientParticles span:nth-child(9) {
+  top: 68%;
+  left: 5%;
+  width: 2px;
+  animation-delay: -9s;
+  animation-duration: 15s;
+}
+.ambientParticles span:nth-child(10) {
+  top: 79%;
+  left: 94%;
+  width: 3px;
+  animation-delay: -6s;
+  animation-duration: 13s;
+}
+.ambientParticles span:nth-child(11) {
+  top: 97%;
+  left: 42%;
+  width: 2px;
+  animation-delay: -1s;
+  animation-duration: 17s;
+}
+.ambientParticles span:nth-child(12) {
+  top: 71%;
+  left: 77%;
+  width: 2px;
+  animation-delay: -12s;
+  animation-duration: 16s;
+}
+.ambientParticles span:nth-child(13) {
+  top: 86%;
+  left: 57%;
+  width: 4px;
+  animation-delay: -8s;
+  animation-duration: 14s;
+}
+.ambientParticles span:nth-child(14) {
+  top: 96%;
+  left: 14%;
+  width: 2px;
+  animation-delay: -4s;
+  animation-duration: 18s;
+}
+.ambientParticles span:nth-child(15) {
+  top: 75%;
+  left: 46%;
+  width: 2px;
+  animation-delay: -11s;
+  animation-duration: 15s;
+}
+.ambientParticles span:nth-child(16) {
+  top: 90%;
+  left: 82%;
+  width: 3px;
+  animation-delay: -7s;
+  animation-duration: 13s;
+}
+
+@keyframes particle-drift {
+  0%,
+  100% {
+    opacity: 0;
+    transform: translate3d(0, 16px, 0) scale(0.75);
+  }
+  18%,
+  82% {
+    opacity: 0.38;
+  }
+  50% {
+    opacity: 0.62;
+    transform: translate3d(22px, -72px, 0) scale(1);
+  }
+}
+
+.invitationPage {
+  position: relative;
+  z-index: 2;
+  width: min(560px, calc(100vw - 32px), calc((100svh - 32px) * 0.5628));
+  aspect-ratio: 941 / 1672;
+  overflow: hidden;
+  background: #f8f0df;
+  container-type: size;
+  box-shadow: 0 24px 56px rgba(34, 18, 8, 0.34);
+  transform-origin: 50% 50%;
+  will-change: opacity, transform, filter;
+}
+
+.pageArtwork {
+  position: absolute;
+  inset: 0;
+  width: 100%;
+  height: 100%;
+  object-fit: contain;
+  object-position: center;
+  user-select: none;
+}
+
+.ganeshaFigureZone {
+  position: absolute;
+  z-index: 4;
+  top: 0;
+  left: 0;
+  right: 0;
+  height: 58%;
+  display: flex;
+  flex-direction: column;
+  align-items: center;
+  justify-content: flex-end;
+  gap: clamp(2px, 1.2cqh, 10px);
+  padding: clamp(4px, 1.6cqh, 14px) 5% clamp(2px, 0.8cqh, 8px);
+  pointer-events: none;
+}
+
+.ganeshaHalo {
+  position: absolute;
+  z-index: 1;
+  top: 50%;
+  left: 50%;
+  width: min(88%, 380px);
+  aspect-ratio: 1;
+  border-radius: 50%;
+  background: radial-gradient(
+    circle,
+    rgba(255, 250, 218, 0.9) 0%,
+    rgba(255, 213, 124, 0.48) 28%,
+    rgba(213, 150, 56, 0.18) 52%,
+    transparent 72%
+  );
+  filter: blur(18px);
+  transform: translate(-50%, -50%);
+  pointer-events: none;
+}
+
+.ganeshaArtworkWrap {
+  position: relative;
+  z-index: 5;
+  width: min(68%, 400px);
+  margin-inline: auto;
+  flex-shrink: 0;
+  pointer-events: none;
+  isolation: isolate;
+}
+
+.ganeshaArtwork {
+  display: block;
+  width: 100%;
+  height: auto;
+  object-fit: contain;
+  filter: drop-shadow(0 20px 24px rgba(92, 50, 12, 0.2));
+  user-select: none;
+}
+
+.divineLight {
+  position: absolute;
+  z-index: 1;
+  top: 28%;
+  left: 50%;
+  width: min(78%, 360px);
+  aspect-ratio: 1;
+  border-radius: 50%;
+  background: radial-gradient(
+    circle,
+    rgba(255, 252, 224, 0.72) 0%,
+    rgba(255, 222, 148, 0.38) 28%,
+    rgba(215, 156, 66, 0.13) 54%,
+    transparent 74%
+  );
+  filter: blur(20px);
+  mix-blend-mode: screen;
+  pointer-events: none;
+  opacity: 0.58;
+  transform: translate3d(-50%, -50%, 0);
+}
+
+.divineLightLive {
+  animation: divine-breath 3.6s ease-in-out infinite;
+  will-change: opacity, transform;
+}
+
+@keyframes divine-breath {
+  0%,
+  100% {
+    opacity: 0.5;
+    transform: translate3d(-50%, -50%, 0) scale(0.97);
+  }
+  50% {
+    opacity: 0.94;
+    transform: translate3d(-50%, -50%, 0) scale(1.05);
+  }
+}
+
+.ganeshaIntro.dissolving .divineLight,
+.ganeshaIntro.dissolving .divineLightLive {
+  animation: none;
+  opacity: 0;
+  transition:
+    opacity 0.7s ease-out,
+    transform 0.7s ease-out;
+  transform: translate3d(-50%, -50%, 0) scale(1);
+}
+
+.ganeshaPrayer {
+  position: relative;
+  z-index: 2;
+  top: auto;
+  left: auto;
+  margin: 0;
+  flex-shrink: 0;
+  color: #9b6530;
+  font-family:
+    "Noto Serif Devanagari", var(--font-noto-serif-devanagari),
+    "Tiro Devanagari", serif;
+  font-synthesis: none;
+  text-rendering: optimizeLegibility;
+  font-size: clamp(1rem, 4.4cqw, 1.55rem);
+  font-weight: 600;
+  letter-spacing: 0.04em;
+  line-height: 1.2;
+  text-align: center;
+  text-shadow: 0 1px 8px rgba(255, 239, 190, 0.8);
+  transform: none;
+  animation: prayer-arrive 0.55s ease-out both;
+}
+
+@keyframes prayer-arrive {
+  from {
+    opacity: 0;
+    transform: translateY(6px);
+  }
+  to {
+    opacity: 1;
+    transform: translateY(0);
+  }
+}
+
+@container (max-height: 560px) {
+  .ganeshaFigureZone {
+    height: 52%;
+    padding: 2px 5% 2px;
+    gap: 2px;
+  }
+
+  .ganeshaArtworkWrap {
+    width: min(58%, 300px);
+  }
+
+  .ganeshaHalo {
+    width: min(80%, 280px);
+  }
+}
+
+@media (max-width: 650px) {
+  .invitationPage {
+    width: 100vw;
+    height: 100svh;
+    height: 100dvh;
+    aspect-ratio: auto;
+    box-shadow: none;
+  }
+
+  .pageArtwork {
+    object-fit: cover;
+  }
+}
+
+@media (orientation: landscape) and (max-height: 620px) {
+  .invitationPage {
+    width: min(500px, calc(100vw - 40px), calc((100svh - 24px) * 0.5628));
+  }
+}
+
+@media (max-width: 760px) {
+  .ambientParticles span {
+    animation: none;
+  }
+
+  .ambientParticles {
+    display: none;
+  }
+
+  .ambientBackground::after {
+    filter: saturate(0.7);
+  }
+
+  .invitationPage {
+    will-change: opacity, transform;
+  }
+
+  .ganeshaFigureZone {
+    height: 56%;
+    padding: clamp(4px, 1.4cqh, 12px) 5% clamp(2px, 0.6cqh, 6px);
+  }
+
+  .ganeshaHalo {
+    filter: blur(10px);
+  }
+
+  .ganeshaArtworkWrap {
+    width: min(64%, 340px);
+  }
+
+  .goldenLight {
+    filter: blur(7px);
+  }
+
+  .divineLight {
+    top: 26%;
+    filter: blur(10px);
+    mix-blend-mode: normal;
+  }
+
+  .divineLightLive {
+    animation: divine-breath 4s ease-in-out infinite;
+  }
+}
+
+@media (prefers-reduced-motion: reduce) {
+  .invitationPage,
+  .ganeshaHalo,
+  .ganeshaArtworkWrap {
+    will-change: auto;
+  }
+  .ambientParticles span,
+  .divineLightLive,
+  .ganeshaPrayer {
+    animation: none;
+  }
+  .divineLightLive {
+    opacity: 0.78;
+  }
+}

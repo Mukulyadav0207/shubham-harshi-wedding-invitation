@@ -1,0 +1,578 @@
+.scene {
+  position: relative;
+  display: flex;
+  flex-direction: column;
+  align-items: center;
+  justify-content: center;
+  width: 100%;
+  min-height: 100svh;
+  overflow: hidden;
+  isolation: isolate;
+  perspective: clamp(1100px, 120vw, 1800px);
+  background: #120b08;
+}
+.sceneLoading .backdrop,
+.sceneLoading .ambientDust,
+.sceneLoading .envelopeFloat {
+  visibility: hidden;
+  opacity: 0;
+  pointer-events: none;
+}
+.envelopeLoader {
+  position: absolute;
+  z-index: 40;
+  inset: 0;
+  display: grid;
+  align-content: center;
+  justify-items: center;
+  gap: 18px;
+  color: rgba(255, 234, 194, 0.9);
+  font-family: Georgia, "Times New Roman", serif;
+  font-size: clamp(0.72rem, 1.5vw, 0.9rem);
+  letter-spacing: 0.15em;
+  text-transform: uppercase;
+  background:
+    radial-gradient(circle at 50% 42%, rgba(126, 61, 36, 0.42), transparent 28%),
+    #120b08;
+}
+.envelopeLoaderRing {
+  width: clamp(48px, 7vw, 68px);
+  aspect-ratio: 1;
+  border: 1px solid rgba(255, 217, 143, 0.24);
+  border-top-color: rgba(255, 230, 172, 0.95);
+  border-radius: 50%;
+  box-shadow: 0 0 22px rgba(214, 143, 57, 0.25);
+  animation: envelope-loader-spin 1.25s linear infinite;
+}
+.envelopeLoaderText {
+  text-align: center;
+}
+.networkToast {
+  max-width: min(92vw, 320px);
+  margin: 2px 0 0;
+  padding: 10px 14px;
+  border: 1px solid rgba(255, 217, 143, 0.34);
+  border-radius: 12px;
+  color: rgba(255, 244, 214, 0.96);
+  font-size: clamp(0.68rem, 2.8vw, 0.78rem);
+  font-weight: 600;
+  letter-spacing: 0.06em;
+  line-height: 1.45;
+  text-align: center;
+  text-transform: none;
+  background: rgba(58, 34, 18, 0.58);
+  box-shadow: 0 8px 22px rgba(12, 7, 4, 0.28);
+}
+@keyframes envelope-loader-spin {
+  to { transform: rotate(360deg); }
+}
+.backdrop {
+  position: absolute;
+  z-index: 0;
+  inset: 0;
+  background: #160b05 url("/assets/images/bg/bg.webp") center / cover no-repeat;
+}
+.ambientDust {
+  position: absolute;
+  z-index: 0;
+  inset: 0;
+  overflow: hidden;
+  pointer-events: none;
+}
+.ambientDust span {
+  position: absolute;
+  top: var(--particle-y);
+  left: var(--particle-x);
+  width: var(--particle-size);
+  aspect-ratio: 1;
+  border-radius: 50%;
+  opacity: 0;
+  background: radial-gradient(
+    circle at 35% 30%,
+    #fff8d5 0 12%,
+    #ffd66d 32%,
+    #e88a27 58%,
+    transparent 76%
+  );
+  box-shadow:
+    0 0 5px 1px rgba(255, 180, 57, 0.8),
+    0 0 14px 3px rgba(159, 36, 13, 0.28);
+  animation: dust-drift var(--particle-duration) ease-in-out
+    var(--particle-delay) infinite;
+}
+@keyframes dust-drift {
+  0%,
+  100% {
+    opacity: 0;
+    transform: translate3d(-5px, 18px, 0) scale(0.55);
+  }
+  18%,
+  82% {
+    opacity: 0.62;
+  }
+  50% {
+    opacity: 0.95;
+    transform: translate3d(14px, -34px, 0) scale(1.15);
+  }
+}
+
+.envelopeFloat {
+  position: relative;
+  z-index: 1;
+  flex-shrink: 0;
+  margin-inline: auto;
+  filter: drop-shadow(0 27px 22px rgba(12, 7, 4, 0.29));
+}
+
+/* Gentle idle bob — only before tap; stops as soon as opening begins. */
+.scene[data-phase="closed"] .envelopeFloat {
+  animation: envelope-settle 2.6s ease-in-out infinite;
+  will-change: transform;
+}
+
+@keyframes envelope-settle {
+  0%,
+  100% {
+    transform: translate3d(0, 0, 0);
+  }
+  50% {
+    transform: translate3d(0, -5px, 0);
+  }
+}
+
+.stage {
+  --card-width: 26%;
+  --card-height: 66%;
+  --card-revealed-height: 72%;
+  --card-y: 15.5%;
+  --card-z: 3;
+  position: relative;
+  width: min(84vw, 680px, calc((100svh - 96px) * 1.5));
+  aspect-ratio: 1536 / 1024;
+  perspective: clamp(1100px, 120vw, 1800px);
+  perspective-origin: 50% 42%;
+  transform-style: preserve-3d;
+  cursor: pointer;
+}
+.stage:focus-visible {
+  outline: 2px solid rgba(255, 230, 170, 0.85);
+  outline-offset: 12px;
+}
+.innerLight {
+  position: absolute;
+  z-index: 2;
+  inset: 20% 21% 12%;
+  border-radius: 5%;
+  background: radial-gradient(
+    ellipse at 50% 72%,
+    rgba(255, 251, 216, 0.88),
+    rgba(236, 190, 109, 0.23) 57%,
+    transparent 78%
+  );
+  filter: blur(16px);
+  pointer-events: none;
+}
+
+.envelopeOpeningLight {
+  position: absolute;
+  z-index: 9;
+  top: 20%;
+  left: 50%;
+  width: 44%;
+  aspect-ratio: 1;
+  border-radius: 50%;
+  opacity: 0;
+  background: radial-gradient(circle, rgba(255, 253, 231, .96) 0%, rgba(255, 230, 153, .7) 24%, rgba(244, 190, 87, .26) 51%, transparent 72%);
+  filter: blur(10px);
+  mix-blend-mode: screen;
+  pointer-events: none;
+  transform: translate(-50%, -50%);
+  will-change: opacity, transform;
+}
+
+/* One-shot reflected light: these are soft pixels over the original artwork, never drawn floral paths. */
+.envelopeLightLayer {
+  position: absolute;
+  z-index: 4;
+  inset: 0;
+  overflow: hidden;
+  pointer-events: none;
+  isolation: isolate;
+  -webkit-mask: url("/assets/images/envlope/half-envelope.webp") center / 100% 100% no-repeat;
+  mask: url("/assets/images/envlope/half-envelope.webp") center / 100% 100% no-repeat;
+}
+.floralLightPath {
+  position: absolute;
+  border-radius: 999px;
+  opacity: 0;
+  pointer-events: none;
+  mix-blend-mode: screen;
+  background: linear-gradient(90deg, transparent 0%, rgba(255, 244, 204, .08) 11%, rgba(255, 253, 231, .72) 48%, rgba(249, 203, 112, .18) 69%, transparent 100%);
+  box-shadow: 0 0 9px 3px rgba(255, 216, 134, .18);
+  filter: blur(4px);
+  will-change: transform, opacity;
+}
+.floralLightCenter { left: 46%; top: 55%; width: 10%; height: 2.1%; transform: rotate(-78deg); transform-origin: 50% 50%; }
+.floralLightLeft { left: 30%; top: 48%; width: 23%; height: 2%; transform: rotate(-31deg); transform-origin: 100% 50%; }
+.floralLightRight { left: 49%; top: 42%; width: 24%; height: 2%; transform: rotate(31deg); transform-origin: 0 50%; }
+.floralLightLowerLeft { left: 27%; top: 67%; width: 22%; height: 2%; transform: rotate(-22deg); transform-origin: 100% 50%; }
+.floralLightLowerRight { left: 52%; top: 66%; width: 22%; height: 2%; transform: rotate(22deg); transform-origin: 0 50%; }
+.floralLightUpper { left: 43%; top: 25%; width: 14%; height: 2.1%; transform: rotate(-82deg); transform-origin: 50% 100%; }
+.lightGlint {
+  position: absolute;
+  z-index: 1;
+  width: clamp(3px, .52%, 6px);
+  aspect-ratio: 1;
+  border-radius: 50%;
+  opacity: 0;
+  background: radial-gradient(circle at 40% 35%, #fffdf0 0 18%, #ffe7a1 42%, rgba(244, 177, 65, .2) 68%, transparent 78%);
+  box-shadow: 0 0 7px 2px rgba(255, 203, 105, .44);
+  filter: blur(.2px);
+  mix-blend-mode: screen;
+  pointer-events: none;
+  will-change: transform, opacity;
+}
+.lightGlintOne { left: 35%; top: 32%; }
+.lightGlintTwo { left: 62%; top: 29%; }
+.lightGlintThree { left: 73%; top: 46%; }
+.lightGlintFour { left: 26%; top: 56%; }
+.lightGlintFive { left: 43%; top: 70%; }
+.lightGlintSix { left: 61%; top: 73%; }
+.lightGlintSeven { left: 52%; top: 43%; }
+.lightGlintEight { left: 79%; top: 64%; }
+
+.foldedCard {
+  position: absolute;
+  z-index: var(--card-z);
+  top: var(--card-y);
+  left: 50%;
+  width: var(--card-width);
+  height: var(--card-height);
+  margin-left: calc(var(--card-width) * -0.5);
+  overflow: hidden;
+  border-radius: 2%;
+  isolation: isolate;
+  filter: drop-shadow(0 7px 9px rgba(57, 34, 18, 0.26));
+  pointer-events: none;
+  transform: translateZ(-2px);
+  transform-origin: 50% 55%;
+  transform-style: preserve-3d;
+}
+.cardArtwork {
+  position: absolute;
+  display: block;
+  inset: 0;
+/* z-index: 3; */
+  width: 100%;
+  height: 100%;
+  object-fit: cover;
+  object-position: center center;
+  max-width: none;
+  pointer-events: none;
+  user-select: none;
+}
+
+.envelopeBackside,
+.halfEnvelope,
+.topFlapGroup > img,
+.ribbonSeal {
+  position: absolute;
+  display: block;
+  inset: 0;
+  width: 100%;
+  height: auto;
+  max-width: none;
+  pointer-events: none;
+  user-select: none;
+}
+.envelopeBackside {
+  z-index: 1;
+  inset: -5% -0.8% auto;
+  width: 102%;
+  height: 108%;
+  transform: translateZ(-4px);
+}
+.halfEnvelope {
+  z-index: 4;
+  transform: translateZ(2px);
+}
+.topFlapGroup {
+  position: absolute;
+  z-index: 6;
+  inset: 0;
+  transform: translateZ(6px) rotateX(0deg);
+  transform-origin: 50% 0.6%;
+  transform-style: preserve-3d;
+  backface-visibility: visible;
+}
+.topFlapShadow {
+  position: absolute;
+  z-index: 0;
+  inset: 2% 1% 20%;
+  opacity: 0.1;
+  clip-path: polygon(3% 4%, 97% 4%, 50% 72%);
+  background: rgba(69, 45, 27, 0.62);
+  filter: blur(7px);
+  pointer-events: none;
+  will-change: opacity, transform;
+}
+.topFlapGroup > img {
+  z-index: 1;
+  inset: auto;
+  top: -19%;
+  left: 1.3%;
+  width: 97.5%;
+  backface-visibility: visible;
+}
+
+@keyframes envelope-flap-open {
+  from {
+    transform: rotateX(0deg);
+  }
+  to {
+    transform: rotateX(158deg);
+  }
+}
+.ribbonSeal {
+  z-index: 7;
+  transform: translate3d(0, 30%, 10px);
+  transition:
+    opacity 0.24s ease,
+    transform 0.3s ease;
+}
+.stage[data-state="opening"] .ribbonSeal,
+.stage[data-state="transitioning"] .ribbonSeal {
+  opacity: 0;
+  transform: translate3d(0, 2%, 12px) scale(0.94);
+}
+
+.stage[data-state="transitioning"] .foldedCard {
+  z-index: 10;
+}
+
+.stage[data-state="transitioning"] .halfEnvelope,
+.stage[data-state="transitioning"] .topFlapGroup {
+  z-index: 2;
+}
+/* .envelopeVeil {
+  position: absolute;
+  z-index: 7;
+  inset: -100vmax;
+  background: rgba(17, 10, 6, 0.58);
+  pointer-events: none;
+  will-change: opacity;
+} */
+
+.cardTransitionLight {
+  position: absolute;
+  z-index: 20;
+  inset: -35%;
+  pointer-events: none;
+  opacity: 0;
+  background:
+    radial-gradient(
+      ellipse 38% 34% at 50% 49%,
+      rgba(255, 252, 225, 0.98) 0%,
+      rgba(255, 240, 189, 0.9) 24%,
+      rgba(255, 220, 140, 0.56) 46%,
+      rgba(244, 192, 96, 0.18) 63%,
+      transparent 78%
+    ),
+    linear-gradient(rgba(255, 250, 226, 0.95), rgba(255, 244, 208, 0.95));
+  filter: blur(10px);
+  transform: scale(0.72);
+}
+
+/* Hide envelope layers once Ganesha owns the screen — stops gold/envelope bleeding through. */
+.scene[data-phase="ganesha"] .backdrop,
+.scene[data-phase="ganesha"] .ambientDust,
+.scene[data-phase="ganesha"] .envelopeFloat,
+.scene[data-phase="ganesha"] .cardTransitionLight,
+.scene[data-phase="websiteTransition"] .backdrop,
+.scene[data-phase="websiteTransition"] .ambientDust,
+.scene[data-phase="websiteTransition"] .envelopeFloat,
+.scene[data-phase="websiteTransition"] .cardTransitionLight {
+  visibility: hidden;
+  opacity: 0;
+  pointer-events: none;
+}
+.musicControl {
+  position: fixed;
+  z-index: 50;
+  right: max(clamp(16px, 3vw, 32px), env(safe-area-inset-right));
+  bottom: max(clamp(16px, 3vw, 32px), env(safe-area-inset-bottom));
+  display: grid;
+  width: clamp(44px, 5vw, 48px);
+  height: clamp(44px, 5vw, 48px);
+  place-items: center;
+  border: 1px solid rgba(255, 231, 181, 0.32);
+  border-radius: 50%;
+  color: rgba(255, 239, 204, 0.92);
+  background: rgba(30, 18, 11, 0.55);
+  box-shadow: 0 5px 18px rgba(0, 0, 0, 0.24);
+  cursor: pointer;
+  pointer-events: auto;
+  touch-action: manipulation;
+  -webkit-tap-highlight-color: transparent;
+}
+.openHint,
+.skipControl {
+  position: fixed;
+  z-index: 31;
+  border: 1px solid rgba(255, 229, 176, .56);
+  color: #633b2b;
+  font-family: Georgia, 'Times New Roman', serif;
+  letter-spacing: .06em;
+  cursor: pointer;
+}
+.openHint {
+  left: 50%;
+  bottom: max(22px, env(safe-area-inset-bottom));
+  padding: 10px 17px;
+  border-radius: 999px;
+  background: rgba(255, 246, 222, .94);
+  box-shadow: 0 7px 18px rgba(27, 15, 8, .25), 0 1px 2px rgba(255, 255, 255, .8) inset;
+  font-size: .82rem;
+  transform: translateX(-50%);
+  animation: open-hint 2.7s ease-in-out infinite;
+}
+.openHint:hover {
+  border-color: rgba(255, 237, 193, .9);
+  background: #fff9e9;
+  box-shadow: 0 10px 22px rgba(27, 15, 8, .3), 0 1px 2px rgba(255, 255, 255, .9) inset;
+  transform: translateX(-50%) translateY(-2px);
+}
+.openHint:active { transform: translateX(-50%) translateY(0) scale(.98); }
+.skipControl {
+  top: max(16px, env(safe-area-inset-top));
+  right: max(16px, env(safe-area-inset-right));
+  padding: 8px 12px;
+  border-radius: 999px;
+  background: rgba(41, 24, 14, .58);
+  color: rgba(255, 242, 210, .94);
+  font-size: .75rem;
+}
+.openHint:focus-visible, .skipControl:focus-visible, .musicControl:focus-visible { outline: 2px solid #fff4cb; outline-offset: 3px; }
+@keyframes open-hint { 0%, 100% { opacity: .82; transform: translate(-50%, 0); } 50% { opacity: 1; transform: translate(-50%, -4px); } }
+.musicControl svg {
+  width: clamp(17px, 2.1vw, 20px);
+  height: clamp(17px, 2.1vw, 20px);
+}
+
+@media (min-width: 901px) {
+  .stage {
+    --card-width: 25.6%;
+    --card-y: 14.8%;
+    width: min(84vw, 680px, calc((100svh - 96px) * 1.5));
+  }
+
+  .foldedCard {
+    margin-left: calc(var(--card-width) * -0.5);
+  }
+}
+
+@media (max-width: 900px) {
+  .stage {
+    --card-width: 29%;
+    --card-height: 72%;
+    --card-revealed-height: 78%;
+    width: min(88vw, calc((100svh - 76px) * 1.5));
+  }
+}
+@media (max-width: 560px) {
+  .stage {
+    --card-width: 32%;
+    --card-height: 78%;
+    --card-revealed-height: 84%;
+    --card-y: 8%;
+    width: min(88vw, calc((100svh - 64px) * 1.5));
+  }
+  .cardTransitionLight {
+    inset: -55%;
+    filter: blur(7px);
+  }
+  .musicControl {
+    right: max(14px, env(safe-area-inset-right));
+    bottom: max(14px, env(safe-area-inset-bottom));
+  }
+  .ambientDust span:nth-child(n + 29) { display: none; }
+  .envelopeFloat {
+    filter: drop-shadow(0 16px 14px rgba(12, 7, 4, .24));
+    perspective: clamp(900px, 110vw, 1400px);
+    perspective-origin: 50% 38%;
+  }
+}
+@media (max-width: 760px) {
+  .ambientDust span,
+  .openHint {
+    animation: none;
+  }
+
+  .scene[data-phase="closed"] .envelopeFloat {
+    animation: envelope-settle 2.6s ease-in-out infinite;
+  }
+
+  .stage {
+    transform-style: flat;
+    perspective: none;
+  }
+
+  .foldedCard {
+    transform: translateZ(0);
+    transform-style: flat;
+    isolation: auto;
+    will-change: transform, opacity;
+  }
+
+  .halfEnvelope {
+    transform: none;
+  }
+
+  .topFlapGroup {
+    z-index: 6;
+    transform: none;
+    transform-origin: 50% 0.6%;
+  }
+
+  .ribbonSeal {
+    z-index: 7;
+    transform: translate3d(0, 30%, 0);
+  }
+
+  .topFlapGroup[data-flap-anim="opening"] {
+    animation: envelope-flap-open var(--flap-duration, 1.6s) linear forwards;
+    transform-origin: 50% 0.6%;
+    transform-style: preserve-3d;
+  }
+
+  .innerLight {
+    filter: blur(8px);
+  }
+
+  .envelopeOpeningLight {
+    filter: blur(6px);
+    mix-blend-mode: normal;
+  }
+
+  .floralLightPath {
+    filter: none;
+    box-shadow: none;
+  }
+
+  .lightGlint {
+    display: none;
+  }
+}
+@media (prefers-reduced-motion: reduce) {
+  .envelopeLoaderRing {
+    animation: none;
+    opacity: 0.82;
+  }
+
+  .scene[data-phase="closed"] .envelopeFloat {
+    animation: none;
+  }
+  .ribbonSeal {
+    transition: none;
+  }
+}

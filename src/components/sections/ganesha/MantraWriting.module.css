@@ -1,0 +1,95 @@
+.mantra {
+    position: absolute;
+    z-index: 3;
+    top: 61%;
+    left: 50%;
+    width: 92%;
+    color: #ae8145;
+    font-family: 'Noto Serif Devanagari', var(--font-noto-serif-devanagari), 'Tiro Devanagari', serif;
+    font-size: clamp(.8rem, 4.1cqw, 1.45rem);
+    font-weight: 500;
+    letter-spacing: .025em;
+    line-height: 1.85;
+    text-align: center;
+    text-shadow: 0 0 10px rgba(205, 157, 80, .18);
+    transform: translateX(-50%);
+    will-change: opacity;
+}
+
+.line {
+    display: flex;
+    justify-content: center;
+    gap: .45em;
+    margin: 0;
+    white-space: nowrap;
+}
+
+.word {
+  display: inline-block;
+}
+
+.wordInk {
+  display: inline-block;
+}
+
+.letter {
+  display: inline-block;
+  filter: brightness(1);
+  will-change: clip-path, filter;
+}
+
+.pen {
+    position: absolute;
+    top: 0;
+    left: 0;
+    width: 9px;
+    height: 9px;
+    border-radius: 50%;
+    background: radial-gradient(circle, #fff8d5 0 16%, #f5cd78 35%, rgba(201, 137, 47, .65) 56%, transparent 72%);
+    box-shadow: 0 0 8px 2px rgba(220, 160, 62, .48);
+    pointer-events: none;
+    transform: translate(-50%, -50%);
+    will-change: transform, opacity;
+}
+
+@media (max-width: 650px) {
+    .mantra {
+        top: 61%;
+        width: 94%;
+        font-size: clamp(.75rem, 4.1cqw, 1.25rem);
+        line-height: 1.75;
+    }
+
+    .line { gap: .28em; }
+}
+
+@media (orientation: landscape) and (max-height: 620px) {
+    .mantra {
+        top: 61%;
+        font-size: clamp(.7rem, 3.8cqw, 1.15rem);
+        line-height: 1.55;
+    }
+}
+
+@media (max-width: 760px) {
+    .letter {
+        will-change: opacity, clip-path;
+        filter: none;
+    }
+
+    .pen {
+        display: none;
+    }
+}
+
+@supports (-webkit-touch-callout: none) {
+    .mantra {
+        font-family: "Noto Serif Devanagari", var(--font-noto-serif-devanagari), serif;
+        font-synthesis: none;
+        text-rendering: optimizeLegibility;
+    }
+}
+
+@media (prefers-reduced-motion: reduce) {
+    .mantra, .word, .letter, .pen { will-change: auto; }
+}

@@ -1,0 +1,1749 @@
+.section {
+  position: relative;
+  display: grid;
+  min-height: 100svh;
+  padding: 72px 24px;
+  place-items: center;
+  overflow: clip;
+  background-color: #f3efe6;
+  background-position: calc(50% + var(--parallax-far-x, 0px))
+    calc(50% + var(--parallax-far-y, 0px));
+  background-repeat: no-repeat;
+  background-size: cover;
+  color: #6b3445;
+  text-align: center;
+}
+
+.section :global(.flowing-particles) {
+  position: absolute;
+  z-index: 0;
+  inset: 0;
+  width: 100%;
+  height: 100%;
+  pointer-events: none;
+}
+
+.story {
+  background-image: url("/assets/images/bg/bg5.webp");
+}
+
+.galleryContent {
+  position: relative;
+  z-index: 1;
+  display: grid;
+  justify-items: center;
+  width: min(100%, 60rem);
+  gap: clamp(22px, 3vw, 38px);
+  translate: var(--parallax-near-x, 0px) var(--parallax-near-y, 0px);
+  transition: translate 0.45s ease-out;
+}
+
+.galleryHeader,
+.galleryFooter {
+  display: grid;
+  justify-items: center;
+  color: #315879;
+  text-align: center;
+}
+
+.galleryEyebrow {
+  margin: 0 0 2px;
+  color: #b8945f;
+  font-size: clamp(0.62rem, 1vw, 0.78rem);
+  letter-spacing: 0.28em;
+  text-transform: uppercase;
+}
+
+.galleryHeader h2 {
+  margin: 0;
+  color: #315879;
+  font-family: var(--font-great-vibes), "Brush Script MT", cursive;
+  font-size: clamp(3.4rem, 7vw, 5.8rem);
+  font-weight: 400;
+  line-height: 0.85;
+}
+
+.galleryDivider {
+  display: flex;
+  align-items: center;
+  gap: 9px;
+  margin: 12px 0;
+  color: #b8945f;
+  font-size: 0.72rem;
+}
+
+.galleryDivider i {
+  width: clamp(38px, 6vw, 64px);
+  height: 1px;
+  background: linear-gradient(90deg, transparent, rgba(184, 148, 95, 0.8));
+}
+
+.galleryDivider i:last-child {
+  transform: scaleX(-1);
+}
+
+.galleryNote {
+  margin: 0;
+  color: rgba(49, 88, 121, 0.88);
+  font-size: clamp(0.78rem, 1.25vw, 0.98rem);
+  font-style: italic;
+  line-height: 1.55;
+}
+
+.galleryCollage {
+  position: relative;
+  isolation: isolate;
+  width: min(100%, 46rem);
+  padding: clamp(18px, 4vw, 42px) clamp(18px, 4vw, 48px);
+}
+
+.galleryPhotos {
+  position: relative;
+  z-index: 2;
+  display: grid;
+  grid-template-columns: repeat(3, minmax(0, 1fr));
+  gap: clamp(15px, 2.8vw, 31px) clamp(15px, 3.6vw, 42px);
+}
+
+.galleryPhoto {
+  position: relative;
+  display: block;
+  aspect-ratio: 0.76;
+  margin: 0;
+  padding: clamp(5px, 0.8vw, 8px) clamp(5px, 0.8vw, 8px) clamp(16px, 2vw, 22px);
+  overflow: visible;
+  background: #fffdf8;
+  box-shadow: 0 9px 16px rgba(43, 63, 77, 0.24);
+  transform: rotate(var(--gallery-rotation));
+  transition:
+    opacity 0.75s cubic-bezier(0.22, 1, 0.36, 1),
+    transform 0.75s cubic-bezier(0.22, 1, 0.36, 1);
+  will-change: opacity, transform;
+}
+
+.galleryPhoto > img:first-child {
+  display: block;
+  width: 100%;
+  height: 100%;
+  object-fit: cover;
+  object-position: center top;
+}
+
+.galleryTape {
+  position: absolute;
+  z-index: 3;
+  top: clamp(-30px, -4.2vw, -16px);
+  left: 50%;
+  width: 54%;
+  height: auto;
+  opacity: 0.8;
+  transform: translateX(-50%) rotate(-4deg);
+  pointer-events: none;
+}
+
+.galleryBotanical,
+.galleryFlower {
+  position: absolute;
+  z-index: 4;
+  height: auto;
+  pointer-events: none;
+}
+
+.galleryLeavesLeft {
+  bottom: -5%;
+  right: -4%;
+  width: 22%;
+  opacity: 0.72;
+transform: rotate(22deg);
+}
+
+.galleryLeafRight {
+  top: 28%;
+  right: 24%;
+  width: 14%;
+  opacity: 0.68;
+  transform: rotate(22deg);
+}
+
+.galleryGoldenLeaf {
+  z-index: 5;
+  bottom: 12%;
+  right: 7%;
+  width: 18%;
+  opacity: 0.56;
+  transform: rotate(-16deg);
+}
+
+.galleryFloralStack {
+  position: absolute;
+  z-index: 4;
+  right: -17%;
+  bottom: -14%;
+  width: clamp(72px, 11vw, 118px);
+  aspect-ratio: 1;
+  pointer-events: none;
+}
+
+.galleryFloralStack img {
+  position: absolute;
+  height: auto;
+}
+
+.galleryStackGoldenLeaf {
+  z-index: 1;
+  right: -13%;
+  bottom: -1%;
+  width: 115%;
+  opacity: 3.1;
+  transform: rotate(-22deg);
+}
+
+.galleryStackWhiteFlower {
+  z-index: 2;
+  right: 3%;
+  bottom: 26%;
+  width: 59%;
+}
+
+.galleryStackBlueFlower {
+  z-index: 3;
+  top: 2%;
+  left: 1%;
+  width: 57%;
+}
+
+.galleryFlowerOne {
+  top: 1%;
+  left: 25%;
+  width: 8%;
+}
+
+.galleryFlowerTwo {
+  right: 8%;
+  bottom: 24%;
+  width: 14%;
+}
+
+.galleryFlowerThree {
+  right: 17%;
+  bottom: 7%;
+  width: 15%;
+}
+
+.galleryFooter {
+  gap: 6px;
+}
+
+.galleryFooter .galleryDivider {
+  margin: 0 0 4px;
+}
+
+.galleryFooter p {
+  max-width: 29rem;
+  margin: 0;
+  color: rgba(49, 88, 121, 0.88);
+  font-size: clamp(0.7rem, 1.1vw, 0.88rem);
+  font-style: italic;
+  line-height: 1.45;
+}
+
+.galleryFooter strong {
+  color: #b8945f;
+  font-family: var(--font-great-vibes), "Brush Script MT", cursive;
+  font-size: clamp(1.5rem, 3vw, 2.25rem);
+  font-weight: 400;
+  line-height: 1;
+}
+
+.galleryHeart {
+  color: #497ba5;
+  font-size: 0.6rem;
+}
+
+.storyVisible .galleryHeader,
+.storyVisible .galleryFooter,
+.storyVisible .galleryBotanical,
+.storyVisible .galleryFlower,
+.storyVisible .galleryFloralStack {
+  opacity: 1;
+  transform: none;
+}
+
+.galleryHeader,
+.galleryFooter,
+.galleryBotanical,
+.galleryFlower,
+.galleryFloralStack {
+  opacity: 0;
+  transform: translate3d(0, 20px, 0);
+  transition:
+    opacity 0.72s cubic-bezier(0.22, 1, 0.36, 1),
+    transform 0.72s cubic-bezier(0.22, 1, 0.36, 1);
+}
+
+.galleryPhotoLeft {
+  opacity: 0;
+  transform: translate3d(-28px, 0, 0) rotate(var(--gallery-rotation));
+}
+.galleryPhotoRight {
+  opacity: 0;
+  transform: translate3d(28px, 0, 0) rotate(var(--gallery-rotation));
+}
+.storyVisible .galleryPhoto {
+  opacity: 1;
+  transform: rotate(var(--gallery-rotation));
+}
+.storyVisible .galleryPhoto:nth-child(1) {
+  transition-delay: 0.22s;
+}
+.storyVisible .galleryPhoto:nth-child(2) {
+  transition-delay: 0.32s;
+}
+.storyVisible .galleryPhoto:nth-child(3) {
+  transition-delay: 0.42s;
+}
+.storyVisible .galleryPhoto:nth-child(4) {
+  transition-delay: 0.52s;
+}
+.storyVisible .galleryPhoto:nth-child(5) {
+  transition-delay: 0.62s;
+}
+.storyVisible .galleryPhoto:nth-child(6) {
+  transition-delay: 0.72s;
+}
+.storyVisible .galleryBotanical,
+.storyVisible .galleryFlower,
+.storyVisible .galleryFloralStack {
+  transition-delay: 0.45s;
+}
+.storyVisible .galleryFooter {
+  transition-delay: 0.74s;
+}
+
+.family {
+  box-sizing: border-box;
+  display: flex;
+  flex-direction: column;
+  justify-content: center;
+  width: 100%;
+  min-height: calc(100vw * 1536 / 1024);
+  margin-bottom: 0;
+  padding: clamp(88px, 14vh, 128px) clamp(20px, 4vw, 48px)
+    clamp(72px, 10vh, 108px);
+  overflow-x: clip;
+  overflow-y: visible;
+  background-color: #f3efe6;
+  background-image: url("/assets/images/bg/bg6.webp");
+  background-position: center top;
+  background-repeat: no-repeat;
+  background-size: 100% 100%;
+  background-attachment: scroll;
+  cursor: pointer;
+  -webkit-tap-highlight-color: transparent;
+}
+
+.family::before {
+  position: absolute;
+  z-index: 0;
+  inset: 0;
+  content: "";
+  background-color: #f3efe6;
+  background-image: url("/assets/images/bg/bg7.webp");
+  background-position: center top;
+  background-repeat: no-repeat;
+  background-size: 100% 100%;
+  opacity: 0;
+  transition: opacity 1.1s cubic-bezier(0.22, 1, 0.36, 1);
+  pointer-events: none;
+}
+
+.family::after {
+  position: absolute;
+  z-index: 1;
+  inset: 0;
+  content: "";
+  pointer-events: none;
+  opacity: 0;
+  background:
+    radial-gradient(
+      ellipse 42% 36% at 16% 40%,
+      rgba(255, 214, 110, 0.22) 0%,
+      transparent 72%
+    ),
+    radial-gradient(
+      ellipse 42% 36% at 84% 40%,
+      rgba(255, 214, 110, 0.22) 0%,
+      transparent 72%
+    ),
+    radial-gradient(
+      ellipse 70% 55% at 50% 58%,
+      rgba(255, 236, 180, 0.1) 0%,
+      transparent 78%
+    );
+  transition: opacity 1.1s cubic-bezier(0.22, 1, 0.36, 1);
+}
+
+.familyLightsOn::before {
+  opacity: 1;
+}
+
+.familyLightsOn::after {
+  opacity: 1;
+}
+
+.familyIntro {
+  position: relative;
+  z-index: 2;
+  display: grid;
+  gap: clamp(28px, 5vw, 52px);
+  width: min(100%, 940px);
+  margin: clamp(6svh, 10vw, 12svh) auto clamp(4svh, 8vw, 8svh);
+  padding: clamp(12px, 2vw, 24px) clamp(8px, 2vw, 20px);
+  translate: var(--parallax-near-x, 0px) var(--parallax-near-y, 0px);
+  transition: translate 0.45s ease-out;
+  cursor: default;
+}
+
+.familyHeader,
+.familyFooter {
+  display: grid;
+  justify-items: center;
+  gap: clamp(6px, 1.2vw, 12px);
+  text-align: center;
+}
+
+.familyFooter {
+  margin-top: clamp(22px, 3.8vw, 32px);
+}
+
+.familyTagline {
+  margin: 0;
+  color: rgba(23, 68, 106, 0.82);
+  font-family: Georgia, "Times New Roman", serif;
+  font-size: clamp(0.58rem, 1.05vw, 0.72rem);
+  font-weight: 600;
+  letter-spacing: 0.28em;
+  line-height: 1.5;
+  text-transform: uppercase;
+}
+
+.familyTitle {
+  margin: 0;
+  color: #15385a;
+  font-family: Georgia, "Times New Roman", serif;
+  font-size: clamp(1.55rem, 3.2vw, 2.35rem);
+  font-weight: 400;
+  letter-spacing: 0.34em;
+  line-height: 1.1;
+  text-transform: uppercase;
+}
+
+.familyScriptHeading,
+.familyScriptFooter {
+  margin: 0;
+  color: #b8945f;
+  font-family: var(--font-great-vibes), "Brush Script MT", cursive;
+  font-size: clamp(2.1rem, 4.8vw, 3.35rem);
+  font-weight: 400;
+  line-height: 0.95;
+}
+
+.familyScriptFooter {
+  font-size: clamp(2rem, 4.5vw, 3.1rem);
+}
+
+.familyFlourish {
+  display: flex;
+  align-items: center;
+  gap: clamp(8px, 1.4vw, 14px);
+  color: #c9a962;
+  font-size: clamp(0.55rem, 0.9vw, 0.68rem);
+  letter-spacing: 0.08em;
+}
+
+.familyFlourish i {
+  display: block;
+  width: clamp(34px, 6vw, 64px);
+  height: 1px;
+  background: linear-gradient(90deg, transparent, rgba(201, 169, 98, 0.72));
+}
+
+.familyFlourish i:last-child {
+  transform: scaleX(-1);
+}
+
+.familyFlourish b {
+  font-weight: 400;
+}
+
+.familyColumns {
+  display: grid;
+  grid-template-columns: minmax(0, 1fr) auto minmax(0, 1fr);
+  align-items: center;
+  gap: clamp(12px, 2.5vw, 36px);
+}
+
+.familyBlock {
+  display: grid;
+  gap: clamp(5px, 0.9vw, 9px);
+  max-width: 22rem;
+}
+
+.familySiblingLabel {
+  margin-top: clamp(10px, 1.8vw, 16px);
+}
+
+.familyBlockGroom {
+  justify-self: end;
+  text-align: right;
+}
+
+.familyBlockBride {
+  justify-self: start;
+  text-align: left;
+}
+
+.familyName {
+  margin: 0 0 clamp(2px, 0.5vw, 6px);
+  color: #15385a;
+  font-family: var(--font-great-vibes), "Brush Script MT", cursive;
+  font-size: clamp(2.6rem, 5.5vw, 4.2rem);
+  font-weight: 400;
+  line-height: 0.88;
+}
+
+.familyGrandparentsLabel,
+.familySiblingLabel {
+  margin: 0;
+  color: #b8945f;
+  font-family: Georgia, "Times New Roman", serif;
+  font-size: clamp(0.58rem, 1vw, 0.68rem);
+  font-style: normal;
+  font-weight: 600;
+  letter-spacing: 0.22em;
+  text-transform: uppercase;
+}
+
+.familyRelation {
+  margin: 0;
+  margin-top: clamp(8px, 1.4vw, 12px);
+  color: #b8945f;
+  font-family: Georgia, "Times New Roman", serif;
+  font-size: clamp(0.58rem, 1vw, 0.68rem);
+  font-style: normal;
+  font-weight: 600;
+  letter-spacing: 0.22em;
+  text-transform: none;
+}
+
+.familyParents,
+.familySiblings {
+  margin: 0;
+  color: rgba(21, 56, 90, 0.88);
+  font-family: Georgia, "Times New Roman", serif;
+  font-size: clamp(0.62rem, 1.05vw, 0.76rem);
+  font-weight: 600;
+  letter-spacing: 0.14em;
+  line-height: 1.55;
+  text-transform: uppercase;
+}
+
+.familySeparator {
+  display: block;
+  width: clamp(28px, 4vw, 44px);
+  height: 1px;
+  margin: clamp(4px, 0.8vw, 8px) 0;
+  background: linear-gradient(
+    90deg,
+    transparent,
+    rgba(201, 169, 98, 0.55),
+    transparent
+  );
+}
+
+.familyBlockGroom .familySeparator {
+  margin-left: auto;
+}
+
+.familyMonogram {
+  position: relative;
+  display: grid;
+  place-items: center;
+  width: clamp(72px, 10vw, 108px);
+  flex-shrink: 0;
+  cursor: pointer;
+  touch-action: manipulation;
+  -webkit-tap-highlight-color: transparent;
+}
+
+.familyMonogramRing {
+  position: relative;
+  display: grid;
+  place-items: center;
+  width: clamp(72px, 10vw, 108px);
+  height: clamp(72px, 10vw, 108px);
+  border: 1px solid rgba(201, 169, 98, 0.42);
+  border-radius: 50%;
+  transform-origin: 50% 100%;
+  background: radial-gradient(
+    circle at 50% 38%,
+    rgba(255, 252, 244, 0.72) 0%,
+    rgba(248, 242, 228, 0.28) 68%,
+    transparent 100%
+  );
+  box-shadow:
+    0 0 0 3px rgba(255, 252, 246, 0.18),
+    inset 0 1px 8px rgba(201, 169, 98, 0.08);
+  transition:
+    box-shadow 1.1s cubic-bezier(0.22, 1, 0.36, 1),
+    border-color 1.1s cubic-bezier(0.22, 1, 0.36, 1);
+  will-change: transform;
+}
+
+.familyMonogramRing::before,
+.familyMonogramRing::after {
+  position: absolute;
+  content: "";
+  pointer-events: none;
+}
+
+.familyMonogramRing::before {
+  inset: -6px;
+  border: 1px solid rgba(201, 169, 98, 0.18);
+  border-radius: 50%;
+}
+
+.familyMonogramRing::after {
+  top: -10px;
+  left: 50%;
+  width: 14px;
+  height: 14px;
+  border: 1px solid rgba(201, 169, 98, 0.35);
+  border-radius: 50%;
+  background: rgba(255, 252, 244, 0.5);
+  transform: translateX(-50%);
+}
+
+.familyMonogramBotanical {
+  position: absolute;
+  inset: -8px;
+  border-radius: 50%;
+  background:
+    radial-gradient(
+      circle at 18% 62%,
+      rgba(168, 186, 148, 0.28) 0 6px,
+      transparent 7px
+    ),
+    radial-gradient(
+      circle at 82% 58%,
+      rgba(168, 186, 148, 0.22) 0 5px,
+      transparent 6px
+    ),
+    radial-gradient(
+      circle at 50% 92%,
+      rgba(201, 169, 98, 0.18) 0 4px,
+      transparent 5px
+    );
+  pointer-events: none;
+}
+
+.familyMonogramInitials {
+  position: relative;
+  z-index: 1;
+  display: flex;
+  align-items: center;
+  gap: 0.18em;
+  color: #b8945f;
+  font-family: Georgia, "Times New Roman", serif;
+  font-size: clamp(0.72rem, 1.2vw, 0.88rem);
+  font-weight: 600;
+  letter-spacing: 0.06em;
+}
+
+.familyMonogramHeart {
+  color: #c9a962;
+  font-size: 0.72em;
+  line-height: 1;
+}
+
+.familyQuote {
+  display: grid;
+  gap: 2px;
+  margin: 0;
+  color: rgba(23, 68, 106, 0.78);
+  font-family: Georgia, "Times New Roman", serif;
+  font-size: clamp(0.58rem, 1vw, 0.7rem);
+  font-weight: 600;
+  letter-spacing: 0.24em;
+  line-height: 1.55;
+  text-transform: uppercase;
+}
+
+.familyHeader,
+.familyColumns,
+.familyFooter {
+  opacity: 0;
+  transform: translateY(18px);
+  transition:
+    opacity 1.15s cubic-bezier(0.22, 1, 0.36, 1),
+    transform 1.15s cubic-bezier(0.22, 1, 0.36, 1),
+    color 1.1s cubic-bezier(0.22, 1, 0.36, 1),
+    text-shadow 1.1s cubic-bezier(0.22, 1, 0.36, 1);
+}
+
+/* The columns themselves should not share the header/footer's vertical
+   motion—the two inner blocks provide the directional reveal. */
+.familyColumns {
+  transform: none;
+}
+
+.familyVisible .familyHeader {
+  opacity: 1;
+  transform: none;
+  transition-delay: 0.08s;
+}
+
+.familyVisible .familyColumns {
+  opacity: 1;
+  transform: none;
+  transition-delay: 0.22s;
+}
+
+.familyVisible .familyFooter {
+  opacity: 1;
+  transform: none;
+  transition-delay: 0.38s;
+}
+
+.familyBlock {
+  opacity: 0;
+  transition:
+    opacity 1.25s cubic-bezier(0.22, 1, 0.36, 1),
+    transform 1.25s cubic-bezier(0.22, 1, 0.36, 1);
+  will-change: opacity, transform;
+}
+
+/* Start beyond the visible invitation panel; transform: none restores the
+   exact existing grid position without changing its layout. */
+.familyBlockGroom {
+  transform: translate3d(-105vw, 0, 0);
+}
+.familyBlockBride {
+  transform: translate3d(105vw, 0, 0);
+}
+
+.familyVisible .familyBlockGroom,
+.familyVisible .familyBlockBride {
+  opacity: 1;
+  transform: none;
+}
+
+.familyVisible .familyBlockGroom {
+  transition-delay: 0.42s;
+}
+.familyVisible .familyBlockBride {
+  transition-delay: 0.6s;
+}
+
+.family .content {
+  border-color: rgba(147, 112, 75, 0.28);
+  background: transparent;
+  box-shadow: none;
+  transition: border-color 1.1s cubic-bezier(0.22, 1, 0.36, 1);
+}
+
+.family .eyebrow,
+.family .content h2,
+.family .note,
+.familyTagline,
+.familyTitle,
+.familyScriptHeading,
+.familyScriptFooter,
+.familyName,
+.familyGrandparentsLabel,
+.familyRelation,
+.familySiblingLabel,
+.familyParents,
+.familySiblings,
+.familyQuote {
+  transition:
+    color 1.1s cubic-bezier(0.22, 1, 0.36, 1),
+    text-shadow 1.1s cubic-bezier(0.22, 1, 0.36, 1);
+}
+
+.family .eyebrow {
+  color: #9b74699a;
+}
+.family .content h2 {
+  color: #683a4ba7;
+}
+.family .note {
+  color: #6757629e;
+}
+
+.familyTagline,
+.familyTitle,
+.familyName,
+.familyParents,
+.familySiblings,
+.familyQuote,
+.familyGrandparentsLabel,
+.familyRelation,
+.familySiblingLabel,
+.familyScriptHeading,
+.familyScriptFooter,
+.familyMonogramInitials {
+  text-shadow: 0 1px 2px rgba(58, 80, 104, 0.08);
+  transition:
+    color 1.1s cubic-bezier(0.22, 1, 0.36, 1),
+    text-shadow 1.1s cubic-bezier(0.22, 1, 0.36, 1),
+    filter 1.1s cubic-bezier(0.22, 1, 0.36, 1);
+}
+
+.familyLightsOn .familyTagline,
+.familyLightsOn .familyTitle,
+.familyLightsOn .familyName,
+.familyLightsOn .familyParents,
+.familyLightsOn .familySiblings,
+.familyLightsOn .familyQuote {
+  color: #0f2f4d;
+  text-shadow:
+    0 0 10px rgba(255, 238, 170, 0.95),
+    0 0 22px rgba(255, 210, 110, 0.72),
+    0 0 38px rgba(255, 195, 80, 0.38),
+    0 2px 6px rgba(35, 50, 72, 0.28);
+}
+
+.familyLightsOn .familyGrandparentsLabel,
+.familyLightsOn .familyRelation,
+.familyLightsOn .familySiblingLabel,
+.familyLightsOn .familyScriptHeading,
+.familyLightsOn .familyScriptFooter,
+.familyLightsOn .familyMonogramInitials {
+  color: #c9a04a;
+  text-shadow:
+    0 0 12px rgba(255, 232, 150, 1),
+    0 0 24px rgba(255, 205, 90, 0.78),
+    0 0 40px rgba(255, 185, 60, 0.42),
+    0 2px 5px rgba(90, 65, 20, 0.22);
+}
+
+.familyLightsOn .familyFlourish {
+  color: #d4b05a;
+  filter: drop-shadow(0 0 8px rgba(255, 220, 120, 0.65));
+}
+
+.familyLightsOn .familyFlourish i {
+  background: linear-gradient(90deg, transparent, rgba(255, 220, 130, 0.95));
+  box-shadow: 0 0 10px rgba(255, 210, 100, 0.45);
+}
+
+.familyLightsOn .familyMonogramRing {
+  border-color: rgba(212, 176, 90, 0.72);
+  box-shadow:
+    0 0 0 3px rgba(255, 252, 246, 0.22),
+    inset 0 1px 10px rgba(255, 220, 140, 0.18),
+    0 0 18px rgba(255, 210, 100, 0.55),
+    0 0 36px rgba(255, 190, 70, 0.28);
+}
+
+.family :global(.flowing-particles) {
+  z-index: 1;
+}
+
+.familyIntro {
+  z-index: 2;
+}
+
+.closing {
+  margin-top: 0;
+  background-color: #f3efe6;
+  background-image: url("/assets/images/bg/bg8.webp");
+  background-position: center bottom;
+  background-size: cover;
+  overscroll-behavior: none;
+  padding: clamp(88px, 14vh, 128px) clamp(20px, 4vw, 48px)
+    clamp(72px, 10vh, 108px);
+}
+
+.closingContent {
+  position: relative;
+  z-index: 2;
+  display: grid;
+  justify-items: center;
+  /* background-color: #5d97ce; */
+  gap: clamp(14px, 2.8vw, 22px);
+  width: min(100%, 34rem);
+  margin: clamp(4svh, 8vw, 10svh) auto;
+  padding: clamp(16px, 3vw, 28px) clamp(12px, 3vw, 24px);
+  text-align: center;
+  translate: var(--parallax-near-x, 0px) var(--parallax-near-y, 0px);
+  transition: translate 0.45s ease-out;
+}
+
+.thankYouTitle {
+  margin: 0 0 clamp(4px, 1vw, 8px);
+  color: #3a5068;
+  font-family: var(--font-great-vibes), "Brush Script MT", cursive;
+  font-size: clamp(3.8rem, 14vw, 6.5rem);
+  font-weight: 400;
+  line-height: 0.88;
+  letter-spacing: 0.01em;
+}
+
+.thankYouSubtitle {
+  margin: 0;
+  color: rgba(58, 80, 104, 0.884);
+  font-family: Georgia, "Times New Roman", serif;
+  font-size: clamp(0.62rem, 1.15vw, 0.76rem);
+  font-weight: 400;
+  letter-spacing: 0.34em;
+  line-height: 1.6;
+  text-transform: lowercase;
+}
+
+.thankYouPresent {
+  margin: clamp(28px, 5vw, 64px) 0 0;
+  color: rgba(48, 71, 95, 0.86);
+  font-family: Georgia, "Times New Roman", serif;
+  font-size: clamp(0.72rem, 1.25vw, 0.88rem);
+  font-style: italic;
+  font-weight: 300;
+  letter-spacing: 0.12em;
+  line-height: 1.65;
+}
+
+.thankYouMessage {
+  display: grid;
+  gap: clamp(2px, 0.5vw, 4px);
+  max-width: 35ch;
+  margin: clamp(10px, 2vw, 18px) 0 0;
+  color: rgba(104, 12, 62, 0.8);
+  font-family: Georgia, "Times New Roman", serif;
+  font-style: italic;
+  font-size: clamp(0.68rem, 2.15vw, 0.86rem);
+  /* font-weight: 500; */
+  letter-spacing: 0.06em;
+  line-height: 1.75;
+}
+
+.thankYouSignOff {
+  display: grid;
+  gap: clamp(8px, 1.6vw, 14px);
+  margin-top: clamp(58px, 3.5vw, 32px);
+  padding-top: clamp(14px, 2.5vw, 22px);
+  border-top: 1px solid rgba(201, 169, 98, 0.28);
+}
+
+.thankYouGratitude {
+  margin: 0;
+  color: rgba(58, 80, 104, 0.72);
+  font-family: Georgia, "Times New Roman", serif;
+  font-size: clamp(0.58rem, 1vw, 0.7rem);
+  font-weight: 600;
+  letter-spacing: 0.28em;
+  line-height: 1.55;
+  text-transform: uppercase;
+}
+
+.thankYouFamily {
+  margin: 0;
+  color: #3a5068;
+  font-family: var(--font-great-vibes), "Brush Script MT", cursive;
+  font-size: clamp(1.85rem, 4.8vw, 2.75rem);
+  font-weight: 400;
+  line-height: 0.95;
+  letter-spacing: 0.02em;
+}
+
+.wishesForm {
+  display: grid;
+  gap: 13px;
+  width: min(100%, 38rem);
+  margin-top: clamp(24px, 4vw, 40px);
+  padding: clamp(20px, 3vw, 30px);
+  border: 1px solid rgba(201, 169, 98, 0.42);
+  border-radius: 22px;
+  background: rgba(255, 252, 246, 0.58);
+  box-shadow:
+    0 14px 34px rgba(58, 80, 104, 0.08),
+    inset 0 1px rgba(255, 255, 255, 0.78);
+  text-align: left;
+  backdrop-filter: blur(7px);
+  -webkit-backdrop-filter: blur(7px);
+}
+.wishesForm header {
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  gap: 9px;
+  color: #3a5068;
+  text-align: center;
+}
+.wishesForm header p {
+  margin: 0;
+  font-family: var(--font-great-vibes), "Brush Script MT", cursive;
+  font-size: clamp(2rem, 4vw, 2.7rem);
+  line-height: 0.9;
+}
+.wishesForm header span {
+  color: #bd8651;
+  font-size: 0.75rem;
+}
+.wishesForm label {
+  display: grid;
+  gap: 7px;
+  color: #3a5068;
+  font-size: 0.72rem;
+  font-weight: 600;
+  letter-spacing: 0.1em;
+}
+.wishesForm input,
+.wishesForm textarea {
+  box-sizing: border-box;
+  width: 100%;
+  border: 1px solid rgba(130, 151, 171, 0.42);
+  border-radius: 12px;
+  padding: 12px 13px;
+  color: #3a5068;
+  background: rgba(255, 255, 255, 0.7);
+  font: inherit;
+  font-size: 0.92rem;
+  letter-spacing: normal;
+  outline: none;
+  transition:
+    border-color 0.2s ease,
+    box-shadow 0.2s ease,
+    background 0.2s ease;
+}
+.wishesForm textarea {
+  min-height: 116px;
+  resize: vertical;
+}
+.wishesForm input::placeholder,
+.wishesForm textarea::placeholder {
+  color: rgba(58, 80, 104, 0.55);
+}
+.wishesForm input:focus,
+.wishesForm textarea:focus {
+  border-color: rgba(189, 134, 81, 0.85);
+  background: rgba(255, 255, 255, 0.92);
+  box-shadow: 0 0 0 3px rgba(201, 169, 98, 0.18);
+}
+.wishesForm [aria-invalid="true"] {
+  border-color: #aa6070;
+}
+.wishesForm button {
+  justify-self: center;
+  min-height: 43px;
+  margin-top: 3px;
+  padding: 11px 22px;
+  border: 1px solid rgba(177, 134, 80, 0.72);
+  border-radius: 999px;
+  color: #fffaf2;
+  background: #667f98;
+  box-shadow: 0 7px 15px rgba(58, 80, 104, 0.18);
+  font: inherit;
+  font-size: 0.78rem;
+  font-weight: 600;
+  letter-spacing: 0.1em;
+  cursor: pointer;
+  transition:
+    transform 0.22s ease,
+    background 0.22s ease,
+    box-shadow 0.22s ease;
+}
+.wishesForm button:hover:not(:disabled),
+.wishesForm button:focus-visible {
+  background: #3a5068;
+  box-shadow: 0 10px 19px rgba(58, 80, 104, 0.23);
+  outline: none;
+  transform: translateY(-2px);
+}
+.wishesForm button:disabled {
+  cursor: wait;
+  opacity: 0.7;
+}
+.formError {
+  display: block;
+  margin: 0;
+  color: #9b4056;
+  font-size: 0.72rem;
+  font-weight: 600;
+  letter-spacing: normal;
+  line-height: 1.4;
+}
+.formSuccess {
+  display: grid;
+  gap: 4px;
+  margin: 2px 0 0;
+  color: #3a5068;
+  font-size: 0.86rem;
+  font-style: italic;
+  line-height: 1.45;
+  text-align: center;
+}
+.formSuccess span {
+  color: rgba(58, 80, 104, 0.72);
+  font-size: 0.76rem;
+}
+
+.closingContent > * {
+  opacity: 0;
+  transform: translateY(16px);
+  transition:
+    opacity 0.95s cubic-bezier(0.22, 1, 0.36, 1),
+    transform 0.95s cubic-bezier(0.22, 1, 0.36, 1);
+}
+
+.closingVisible .thankYouTitle {
+  opacity: 1;
+  transform: none;
+  transition-delay: 0.06s;
+}
+
+.closingVisible .thankYouSubtitle {
+  opacity: 1;
+  transform: none;
+  transition-delay: 0.14s;
+}
+
+.closingVisible .thankYouPresent {
+  opacity: 1;
+  transform: none;
+  transition-delay: 0.22s;
+}
+
+.closingVisible .thankYouMessage {
+  opacity: 1;
+  transform: none;
+  transition-delay: 0.3s;
+}
+
+.closingVisible .thankYouSignOff {
+  opacity: 1;
+  transform: none;
+  transition-delay: 0.62s;
+}
+
+.closingVisible .wishesForm {
+  opacity: 1;
+  transform: none;
+  transition-delay: 0.46s;
+}
+
+@media (max-width: 760px) {
+  .section {
+    background-position: 50% 50%;
+    background-size: cover;
+  }
+
+  .galleryContent,
+  .familyIntro {
+    translate: none;
+  }
+
+  .story {
+    min-height: auto;
+    padding: clamp(58px, 15vw, 78px) 16px clamp(64px, 16vw, 86px);
+  }
+
+  .galleryContent {
+    width: min(100%, 31rem);
+    gap: clamp(19px, 6vw, 28px);
+  }
+
+  .galleryHeader h2 {
+    font-size: clamp(3rem, 15vw, 4.35rem);
+  }
+
+  .galleryNote {
+    font-size: clamp(0.7rem, 3.4vw, 0.82rem);
+  }
+
+  .galleryCollage {
+    width: 100%;
+    padding: 17px 10px 22px;
+  }
+
+  .galleryPhotos {
+    grid-template-columns: repeat(2, minmax(0, 1fr));
+    gap: clamp(16px, 6vw, 27px) clamp(13px, 5vw, 22px);
+  }
+
+  .galleryPhoto {
+    padding: 5px 5px clamp(13px, 5vw, 18px);
+    box-shadow: 0 6px 13px rgba(43, 63, 77, 0.23);
+  }
+
+  .galleryLeavesLeft {
+    bottom: 3%;
+    left: 42%;
+    width: 14%;
+    /* transform: rotate(2deg); */
+  }
+
+  .galleryLeafRight {
+    top: 12%;
+    right: -3%;
+    width: 14%;
+  }
+
+  .galleryGoldenLeaf {
+    right: 3%;
+    bottom: 4%;
+    width: 13%;
+  }
+
+  .galleryFloralStack {
+    right: -11%;
+    bottom: -8%;
+    width: clamp(52px, 17vw, 68px);
+  }
+
+  .galleryFlowerOne {
+    top: 1%;
+    left: -3%;
+    width: 12%;
+  }
+
+  .galleryFlowerTwo {
+    top: 48%;
+    right: 1%;
+    bottom: auto;
+    width: 12%;
+  }
+
+  .galleryFlowerThree {
+    right: 6%;
+    bottom: 2%;
+    width: 12%;
+  }
+
+  .galleryFooter p {
+    max-width: 29ch;
+    font-size: clamp(0.65rem, 3vw, 0.76rem);
+  }
+
+  .family {
+    padding: calc(100vw * 0.1) 14px calc(100vw * 0.08);
+  }
+
+  .familyIntro {
+    gap: clamp(16px, 4.5vw, 22px);
+    width: min(100%, 392px);
+    margin: 0 auto;
+    padding-inline: 6px;
+  }
+
+  .familyHeader,
+  .familyFooter {
+    gap: clamp(6px, 1.6vw, 10px);
+  }
+
+  .familyFooter {
+    margin-top: clamp(16px, 5vw, 24px);
+  }
+
+  .familyTagline {
+    font-size: clamp(0.48rem, 2.6vw, 0.58rem);
+    letter-spacing: 0.16em;
+    line-height: 1.45;
+  }
+
+  .familyTitle {
+    font-size: clamp(0.98rem, 4.6vw, 1.2rem);
+    letter-spacing: 0.12em;
+  }
+
+  .familyScriptHeading {
+    font-size: clamp(1.45rem, 6.4vw, 1.85rem);
+    line-height: 0.92;
+  }
+
+  .familyScriptFooter {
+    font-size: clamp(1.28rem, 5.8vw, 1.62rem);
+  }
+
+  .familyFlourish {
+    gap: 8px;
+  }
+
+  .familyFlourish i {
+    width: clamp(24px, 9vw, 40px);
+  }
+
+  .familyColumns {
+    grid-template-columns: minmax(0, 1fr) auto minmax(0, 1fr);
+    align-items: start;
+    gap: clamp(10px, 3vw, 16px);
+  }
+
+  .familyBlock,
+  .familyBlockGroom,
+  .familyBlockBride {
+    justify-self: stretch;
+    max-width: none;
+    gap: clamp(4px, 1.2vw, 7px);
+  }
+
+  .familyBlockGroom {
+    text-align: right;
+  }
+
+  .familyBlockBride {
+    text-align: left;
+  }
+
+  /* Keep the same mirrored, viewport-relative reveal on narrow screens. */
+  .familyBlockGroom {
+    transform: translate3d(-105vw, 0, 0);
+  }
+  .familyBlockBride {
+    transform: translate3d(105vw, 0, 0);
+  }
+  .familyVisible .familyBlockGroom,
+  .familyVisible .familyBlockBride {
+    transform: none;
+  }
+
+  .familyBlockGroom .familySeparator {
+    margin-left: auto;
+    margin-right: 0;
+  }
+
+  .familyBlockBride .familySeparator {
+    margin-right: auto;
+    margin-left: 0;
+  }
+
+  .familyName {
+    margin-bottom: clamp(4px, 1.2vw, 8px);
+    font-size: clamp(1.65rem, 7.2vw, 2.05rem);
+    line-height: 0.9;
+  }
+
+  .familyGrandparentsLabel,
+  .familySiblingLabel {
+    font-size: clamp(0.46rem, 2.1vw, 0.54rem);
+    letter-spacing: 0.07em;
+    line-height: 1.35;
+  }
+
+  .familyRelation {
+    font-size: clamp(0.46rem, 2.1vw, 0.54rem);
+    letter-spacing: 0.09em;
+    line-height: 1.35;
+    text-transform: none;
+  }
+
+  .familyGrandparentsLabel,
+  .familySiblingLabel {
+    letter-spacing: 0.09em;
+  }
+
+  .familyRelation {
+    margin-top: clamp(7px, 2vw, 10px);
+  }
+
+  .familySiblingLabel {
+    margin-top: clamp(9px, 2.4vw, 13px);
+  }
+
+  .familyParents,
+  .familySiblings {
+    font-size: clamp(0.46rem, 2.1vw, 0.54rem);
+    letter-spacing: 0.04em;
+    line-height: 1.45;
+    word-break: break-word;
+  }
+
+  .familySeparator {
+    width: clamp(22px, 8vw, 32px);
+    margin: clamp(4px, 1.2vw, 7px) 0;
+  }
+
+  .familyMonogram {
+    order: 0;
+    align-self: center;
+    width: clamp(40px, 11vw, 50px);
+    margin: 0 auto;
+    translate: 0 clamp(-6px, -1.6vw, -3px);
+  }
+
+  .familyMonogramRing {
+    width: clamp(40px, 11vw, 50px);
+    height: clamp(40px, 11vw, 50px);
+  }
+
+  .familyMonogramRing::after {
+    top: -7px;
+    width: 9px;
+    height: 9px;
+  }
+
+  .familyMonogramInitials {
+    font-size: clamp(0.5rem, 2.3vw, 0.58rem);
+  }
+
+  .familyQuote {
+    font-size: clamp(0.44rem, 2vw, 0.52rem);
+    letter-spacing: 0.1em;
+    line-height: 1.45;
+  }
+
+  .closing {
+    box-sizing: border-box;
+    display: flex;
+    flex-direction: column;
+    justify-content: center;
+    margin-top: -1px;
+    min-height: 100svh;
+    padding: clamp(72px, 14vw, 96px) 18px clamp(64px, 12vw, 88px);
+    background-position: center bottom;
+    background-repeat: no-repeat;
+    background-size: cover;
+  }
+
+  .closingContent {
+    gap: clamp(12px, 3.2vw, 18px);
+    width: min(100%, 22rem);
+    margin: 0 auto;
+    padding: clamp(8px, 2vw, 16px) clamp(10px, 3vw, 16px);
+  }
+
+  .thankYouTitle {
+    font-size: clamp(3.2rem, 13vw, 4.4rem);
+  }
+
+  .thankYouSubtitle {
+    font-size: clamp(0.54rem, 2.4vw, 0.62rem);
+    letter-spacing: 0.28em;
+  }
+
+  .thankYouPresent {
+    font-size: clamp(0.66rem, 2.6vw, 0.76rem);
+    letter-spacing: 0.1em;
+  }
+
+  .thankYouMessage {
+    max-width: 26ch;
+    margin-top: clamp(8px, 2vw, 14px);
+    font-size: clamp(0.62rem, 2.7vw, 0.76rem);
+    line-height: 1.7;
+  }
+
+  .thankYouSignOff {
+    gap: clamp(6px, 1.8vw, 10px);
+    margin-top: clamp(14px, 3.5vw, 22px);
+    padding-top: clamp(12px, 2.8vw, 18px);
+  }
+
+  .thankYouGratitude {
+    font-size: clamp(0.52rem, 2.1vw, 0.6rem);
+    letter-spacing: 0.22em;
+  }
+
+  .thankYouFamily {
+    font-size: clamp(1.65rem, 6.8vw, 2.2rem);
+  }
+
+  .wishesForm {
+    width: min(100%, 23rem);
+    margin-top: 22px;
+    padding: 18px 15px;
+    border-radius: 18px;
+  }
+
+  .wishesForm textarea {
+    min-height: 126px;
+  }
+  .wishesForm button {
+    width: 100%;
+  }
+}
+
+@media (min-width: 761px) {
+  .section {
+    padding: 112px 48px;
+  }
+
+  .galleryContent {
+    width: min(100%, 70rem);
+  }
+
+  .galleryCollage {
+    width: min(100%, 58rem);
+    padding-inline: clamp(22px, 3vw, 42px);
+  }
+
+  .galleryPhotos {
+    gap: clamp(20px, 2.8vw, 34px) clamp(22px, 3.6vw, 44px);
+  }
+
+  .familyIntro {
+    margin: clamp(8svh, 12vw, 14svh) auto clamp(6svh, 10vw, 10svh);
+  }
+
+  .closingContent {
+    width: min(100%, 58rem);
+    margin: clamp(6svh, 10vw, 12svh) auto;
+  }
+
+  /* Preserve the invitation's airy composition while making its closing
+       message comfortably readable on tablet and desktop screens. */
+  .thankYouTitle {
+    font-size: clamp(4.8rem, 8vw, 7.5rem);
+  }
+
+  .thankYouSubtitle {
+    font-size: clamp(0.78rem, 1.2vw, 1rem);
+  }
+
+  .thankYouPresent {
+    font-size: clamp(0.9rem, 1.4vw, 1.12rem);
+  }
+
+  .thankYouMessage {
+    max-width: 52ch;
+    font-size: clamp(0.88rem, 1.3vw, 1.05rem);
+    line-height: 1.8;
+  }
+
+  .thankYouGratitude {
+    font-size: clamp(0.7rem, 1.05vw, 0.86rem);
+  }
+
+  .thankYouFamily {
+    font-size: clamp(2.3rem, 5vw, 3.25rem);
+  }
+
+  .familyBlock,
+  .closingContent > * {
+    will-change: auto;
+  }
+}
+
+@media (min-width: 1200px) {
+  .familyIntro {
+    width: min(100%, 78vw);
+    max-width: 1480px;
+    gap: clamp(40px, 4.8vw, 88px);
+    margin: clamp(10svh, 11vw, 15svh) auto;
+  }
+
+  .familyColumns {
+    gap: clamp(28px, 4.5vw, 88px);
+  }
+
+  .familyBlock {
+    max-width: min(34vw, 30rem);
+    gap: clamp(8px, 1.1vw, 14px);
+  }
+
+  .familyTagline {
+    font-size: clamp(0.72rem, 1.15vw, 1.15rem);
+    letter-spacing: 0.3em;
+  }
+
+  .familyTitle {
+    font-size: clamp(2.35rem, 3.9vw, 4.8rem);
+    letter-spacing: 0.36em;
+  }
+
+  .familyScriptHeading {
+    font-size: clamp(3.35rem, 5.8vw, 7rem);
+  }
+
+  .familyScriptFooter {
+    font-size: clamp(3.1rem, 5.2vw, 6.5rem);
+  }
+
+  .familyName {
+    font-size: clamp(4.2rem, 6.8vw, 8.5rem);
+  }
+
+  .familyGrandparentsLabel,
+  .familySiblingLabel,
+  .familyRelation {
+    font-size: clamp(0.68rem, 1.15vw, 1.08rem);
+  }
+
+  .familyParents,
+  .familySiblings {
+    font-size: clamp(0.76rem, 1.25vw, 1.2rem);
+    letter-spacing: 0.16em;
+  }
+
+  .familyQuote {
+    font-size: clamp(0.7rem, 1.1vw, 1.08rem);
+    letter-spacing: 0.28em;
+  }
+
+  .familyMonogram {
+    width: clamp(108px, 11vw, 168px);
+  }
+
+  .familyMonogramRing {
+    width: clamp(108px, 11vw, 168px);
+    height: clamp(108px, 11vw, 168px);
+  }
+
+  .familyMonogramInitials {
+    font-size: clamp(0.88rem, 1.35vw, 1.35rem);
+  }
+
+  .familyFlourish i {
+    width: clamp(64px, 8vw, 120px);
+  }
+
+  .closingContent {
+    width: min(100%, 52vw);
+    max-width: 920px;
+    gap: clamp(18px, 2.4vw, 32px);
+    margin: clamp(8svh, 10vw, 14svh) auto;
+  }
+
+  .thankYouTitle {
+    font-size: clamp(7.5rem, 9vw, 10.5rem);
+  }
+
+  .thankYouSubtitle {
+    font-size: clamp(1rem, 1.45vw, 1.4rem);
+    letter-spacing: 0.36em;
+  }
+
+  .thankYouPresent {
+    margin-top: clamp(48px, 6vw, 96px);
+    font-size: clamp(1.12rem, 1.65vw, 1.55rem);
+  }
+
+  .thankYouMessage {
+    max-width: 56ch;
+    font-size: clamp(1.05rem, 1.5vw, 1.4rem);
+    line-height: 1.85;
+  }
+
+  .thankYouGratitude {
+    font-size: clamp(0.86rem, 1.2vw, 1.1rem);
+    letter-spacing: 0.32em;
+  }
+
+  .thankYouFamily {
+    font-size: clamp(3.25rem, 5.8vw, 5.25rem);
+  }
+
+  .wishesForm {
+    width: min(100%, 44rem);
+    padding: clamp(28px, 3.2vw, 40px);
+  }
+
+  .wishesForm header p {
+    font-size: clamp(2.7rem, 4.2vw, 3.8rem);
+  }
+
+  .wishesForm label {
+    font-size: clamp(0.78rem, 1vw, 0.95rem);
+  }
+
+  .wishesForm input,
+  .wishesForm textarea {
+    font-size: clamp(0.95rem, 1.15vw, 1.12rem);
+    padding: 14px 16px;
+  }
+
+  .wishesForm button {
+    min-height: 48px;
+    padding: 13px 28px;
+    font-size: clamp(0.82rem, 1vw, 0.98rem);
+  }
+}
+
+@media (min-width: 1800px) {
+  .familyIntro {
+    width: min(100%, 82vw);
+    max-width: 1680px;
+  }
+
+  .familyBlock {
+    max-width: min(36vw, 34rem);
+  }
+
+  .closingContent {
+    width: min(100%, 56vw);
+    max-width: 1040px;
+  }
+
+  .thankYouTitle {
+    font-size: clamp(10.5rem, 10vw, 12.5rem);
+  }
+
+  .thankYouSubtitle {
+    font-size: clamp(1.4rem, 1.55vw, 1.65rem);
+  }
+
+  .thankYouPresent {
+    margin-top: clamp(64px, 7vw, 120px);
+    font-size: clamp(1.55rem, 1.75vw, 1.85rem);
+  }
+
+  .thankYouMessage {
+    font-size: clamp(1.4rem, 1.6vw, 1.65rem);
+  }
+
+  .thankYouFamily {
+    font-size: clamp(5.25rem, 6.2vw, 6.5rem);
+  }
+}
+
+@media (prefers-reduced-motion: reduce) {
+  .family {
+    background-attachment: scroll;
+  }
+
+  .family::before {
+    transition: none;
+  }
+
+  .familyIntro,
+  .familyTagline,
+  .familyTitle,
+  .familyScriptHeading,
+  .familyScriptFooter,
+  .familyName,
+  .familyGrandparentsLabel,
+  .familyRelation,
+  .familySiblingLabel,
+  .familyParents,
+  .familySiblings,
+  .familyQuote,
+  .familyHeader,
+  .familyColumns,
+  .familyFooter,
+  .family .content,
+  .family .eyebrow,
+  .family .content h2,
+  .family .note {
+    transition: none;
+    animation: none;
+  }
+
+  .familyHeader,
+  .familyColumns,
+  .familyFooter {
+    opacity: 1;
+    transform: none;
+  }
+
+  .familyBlock {
+    opacity: 1;
+    transform: none;
+    transition: none;
+  }
+
+  .closingContent > * {
+    opacity: 1;
+    transform: none;
+    transition: none;
+  }
+}

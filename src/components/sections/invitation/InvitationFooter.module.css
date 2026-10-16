@@ -1,0 +1,214 @@
+.footer {
+  position: relative;
+  z-index: 3;
+  margin-top: -1px;
+  padding: clamp(22px, 4vw, 36px) clamp(20px, 5vw, 88px)
+    max(22px, env(safe-area-inset-bottom));
+  border-top: 1px solid rgba(168, 197, 228, 0.72);
+  background: rgba(183, 201, 221, 0.76);
+  box-shadow:
+    0 -1px 0 rgba(58, 80, 104, 0.1),
+    0 -10px 32px rgba(41, 74, 104, 0.18),
+    0 -4px 14px rgba(58, 80, 104, 0.1);
+  backdrop-filter: blur(14px);
+  -webkit-backdrop-filter: blur(14px);
+  color: #294a68;
+  font-family: Georgia, "Times New Roman", serif;
+}
+
+.inner {
+  display: grid;
+  grid-template-columns: 1fr auto;
+  grid-template-areas:
+    "brand top"
+    "signoff signoff";
+  gap: clamp(12px, 2.4vw, 18px) clamp(10px, 2vw, 16px);
+  align-items: start;
+  width: min(100%, 980px);
+  margin-inline: auto;
+}
+
+.brand {
+  grid-area: brand;
+  display: grid;
+  gap: 5px;
+  justify-items: center;
+  text-align: center;
+}
+
+.hashtag {
+  margin: 0;
+  color: #743149;
+  font-family: var(--font-seaweed-script), "Brush Script MT", cursive;
+  font-size: clamp(1.28rem, 3vw, 1.85rem);
+  font-weight: 400;
+  letter-spacing: 0.01em;
+  line-height: 1.1;
+}
+
+.names {
+  margin: 0;
+  color: #082541;
+  font-size: clamp(0.92rem, 2vw, 1.18rem);
+  font-weight: 600;
+  letter-spacing: 0.08em;
+  line-height: 1.25;
+  text-transform: uppercase;
+}
+
+.date {
+  margin: 0;
+  color: #3f6280;
+  font-size: clamp(0.72rem, 1.5vw, 0.9rem);
+  font-weight: 600;
+  letter-spacing: 0.14em;
+  line-height: 1.25;
+  text-transform: uppercase;
+}
+
+.signOff {
+  grid-area: signoff;
+  display: grid;
+  gap: 3px;
+  justify-items: center;
+  width: 100%;
+  padding-top: clamp(2px, 0.8vw, 6px);
+  text-align: center;
+}
+
+.gratitude {
+  margin: 0;
+  color: #021528;
+  font-size: clamp(0.74rem, 1.55vw, 0.88rem);
+  font-weight: 800;
+  letter-spacing: 0.18em;
+  line-height: 1.35;
+  text-transform: uppercase;
+}
+
+.family {
+  margin: 0;
+  color: #743149;
+  font-family: var(--font-great-vibes), "Brush Script MT", cursive;
+  font-size: clamp(1.35rem, 3.2vw, 1.9rem);
+  line-height: 1;
+}
+
+.topButton {
+  grid-area: top;
+  display: inline-flex;
+  align-items: center;
+  gap: 5px;
+  margin-top: 2px;
+  padding: 8px 12px;
+  border: 1px solid rgba(168, 197, 228, 0.993);
+  border-radius: 999px;
+  color: #294a68;
+  background: rgba(255, 251, 243, 0.72);
+  font: inherit;
+  font-size: 0.68rem;
+  font-weight: 600;
+  letter-spacing: 0.1em;
+  text-transform: uppercase;
+  white-space: nowrap;
+  cursor: pointer;
+  transition:
+    color 0.22s ease,
+    background 0.22s ease,
+    transform 0.22s ease;
+}
+
+.topButton svg {
+  width: 13px;
+  height: 13px;
+}
+
+.topButton:hover,
+.topButton:focus-visible {
+  color: #082541;
+  background: rgba(225, 237, 248, 0.82);
+  outline: none;
+  transform: translateY(-1px);
+}
+
+@media (min-width: 761px) {
+  .inner {
+    grid-template-columns: minmax(0, 1fr) auto minmax(0, 1fr);
+    grid-template-areas: "brand signoff top";
+    gap: clamp(20px, 3.5vw, 36px);
+    align-items: center;
+  }
+
+  .brand {
+    justify-self: start;
+    justify-items: start;
+    text-align: left;
+  }
+
+  .signOff {
+    justify-self: center;
+    width: auto;
+    padding-top: 0;
+  }
+
+  .gratitude {
+    font-size: clamp(0.8rem, 1.2vw, 0.9rem);
+  }
+
+  .topButton {
+    justify-self: end;
+    margin-top: 0;
+    padding: 9px 14px;
+    font-size: 0.72rem;
+  }
+
+  .topButton svg {
+    width: 14px;
+    height: 14px;
+  }
+}
+
+@media (max-width: 760px) {
+  .footer {
+    --footer-block-padding: clamp(20px, 4.5vw, 28px);
+    padding:
+      var(--footer-block-padding)
+      14px
+      calc(var(--footer-block-padding) + env(safe-area-inset-bottom));
+    background: rgba(183, 201, 221, 0.9);
+    backdrop-filter: blur(6px);
+    -webkit-backdrop-filter: blur(6px);
+  }
+
+  .inner {
+    display: flex;
+    flex-direction: column;
+    align-items: center;
+    position: relative;
+    gap: 0;
+  }
+
+  .brand {
+    width: 100%;
+    justify-items: center;
+    text-align: center;
+    padding-inline: 52px;
+  }
+
+  .signOff {
+    padding-top: clamp(22px, 7vw, 40px);
+  }
+
+  .topButton {
+    position: absolute;
+    top: 0;
+    right: 0;
+    margin-top: 0;
+  }
+}
+
+@media (prefers-reduced-motion: reduce) {
+  .topButton {
+    transition: none;
+  }
+}

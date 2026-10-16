@@ -1,0 +1,150 @@
+.nav {
+  position: fixed;
+  top: 0;
+  left: 0;
+  right: 0;
+  z-index: 28;
+  display: flex;
+  width: 100%;
+  min-height: 68px;
+  align-items: center;
+  justify-content: space-between;
+  padding: max(12px, env(safe-area-inset-top)) clamp(20px, 5vw, 88px) 12px;
+  /* border-bottom: 1px solid rgba(201, 169, 98, 0.46); */
+  background: rgba(183, 201, 221, 0.76);
+  box-shadow:
+    0 1px 0 rgba(58, 80, 104, 0.1),
+    0 10px 32px rgba(41, 74, 104, 0.22),
+    0 4px 14px rgba(58, 80, 104, 0.14);
+  backdrop-filter: blur(14px);
+  -webkit-backdrop-filter: blur(14px);
+  font-family: Georgia, "Times New Roman", serif;
+}
+.desktopMark,
+.mark {
+  color: #743149;
+  font-family: var(--font-seaweed-script), "Brush Script MT", cursive;
+  font-size: clamp(1.15rem, 2.4vw, 1.5rem);
+  font-weight: 400;
+  letter-spacing: 0.01em;
+  white-space: nowrap;
+}
+.desktopNav {
+  display: flex;
+  align-items: center;
+  gap: 4px;
+}
+.desktopNav button,
+.mobilePanel button {
+  position: relative;
+  border: 0;
+  border-radius: 999px;
+  padding: 9px 13px;
+  color: #294a68;
+  background: transparent;
+  font: inherit;
+  font-size: 0.72rem;
+  letter-spacing: 0.1em;
+  cursor: pointer;
+  transition:
+    color 0.22s ease,
+    background 0.22s ease,
+    transform 0.22s ease;
+}
+.desktopNav button:hover,
+.desktopNav button:focus-visible,
+.desktopNav .active,
+.mobilePanel .active {
+  font-weight: bold;
+  color: #082541;
+  background: rgba(225, 237, 248, 0.54);
+  outline: none;
+}
+.desktopNav button:hover {
+  transform: translateY(-1px);
+}
+.mobileNav,
+.mobilePanel {
+  display: none;
+}
+@media (max-width: 760px) {
+  .nav {
+    min-height: 62px;
+    padding: max(10px, env(safe-area-inset-top)) 14px 10px;
+    background: rgba(183, 201, 221, 0.9);
+    box-shadow:
+      0 1px 0 rgba(58, 80, 104, 0.12),
+      0 12px 36px rgba(41, 74, 104, 0.26),
+      0 5px 16px rgba(58, 80, 104, 0.16);
+    backdrop-filter: blur(6px);
+    -webkit-backdrop-filter: blur(6px);
+  }
+  .desktopMark {
+    display: none;
+  }
+  .desktopNav {
+    display: none;
+  }
+  .mobileNav {
+    display: flex;
+    width: 100%;
+    align-items: center;
+    justify-content: space-between;
+    padding: 0;
+    color: #294a68;
+  }
+  .mark {
+    font-size: clamp(1.05rem, 4.8vw, 1.28rem);
+  }
+  .menuButton {
+    display: grid;
+    width: 34px;
+    height: 34px;
+    place-items: center;
+    border: 1px solid rgba(168, 197, 228, 0.993);
+    border-radius: 50%;
+    color: #294a68;
+    background: rgba(255, 251, 243, 0.582);
+  }
+  .menuButton svg {
+    width: 17px;
+    height: 17px;
+  }
+  .mobilePanel {
+    position: absolute;
+    top: calc(100% + 1px);
+    right: 14px;
+    left: 14px;
+    display: grid;
+    gap: 3px;
+    padding: 8px;
+    border: 1px solid rgba(168, 197, 228, 0.993);
+    border-radius: 19px;
+    opacity: 0;
+    background: rgba(184, 207, 231, 0.88);
+    box-shadow: 0 14px 32px rgba(58, 80, 104, 0.18);
+    pointer-events: none;
+    transform: translate3d(0, -8px, 0);
+    transition:
+      opacity 0.25s ease,
+      transform 0.25s ease;
+    backdrop-filter: blur(6px);
+    -webkit-backdrop-filter: blur(6px);
+  }
+  .mobilePanelOpen {
+    opacity: 1;
+    pointer-events: auto;
+    transform: none;
+  }
+  .mobilePanel button {
+    width: 100%;
+    padding: 11px 14px;
+    text-align: left;
+  }
+}
+@media (prefers-reduced-motion: reduce) {
+  .desktopNav button,
+  .mobilePanel {
+    transition: none;
+  }
+}
