@@ -1,11 +1,11 @@
 #!/usr/bin/env python3
-"""Regenerate public/og-image.webp — link preview art for WhatsApp / social."""
+"""Regenerate public/og-image.webp — Mandeep & Ritika style link preview."""
 
 from __future__ import annotations
 
 from pathlib import Path
 
-from PIL import Image, ImageDraw, ImageFont, ImageFilter
+from PIL import Image, ImageDraw, ImageFont, ImageFilter, ImageEnhance
 
 ROOT = Path(__file__).resolve().parents[1]
 OUT = ROOT / "public" / "og-image.webp"
@@ -13,18 +13,12 @@ PHOTO = ROOT / "public" / "assets" / "images" / "bg" / "mr-photo.webp"
 
 WIDTH, HEIGHT = 1200, 630
 GOLD = (196, 168, 118)
-GOLD_LIGHT = (228, 204, 158)
-NAVY = (48, 78, 112)
-SKY_PANEL = (236, 244, 252)
-WINE = (108, 38, 62)
-WINE_SOFT = (124, 48, 72)
+NAVY = (52, 82, 118)
+SKY = (228, 238, 248)
+TAGLINE_BLUE = (72, 102, 132)
 
-PANEL_LEFT = 24
-PANEL_TOP = 22
-PANEL_RIGHT = 542
-PANEL_BOTTOM = HEIGHT - 22
-TEXT_LEFT = 48
-TEXT_WIDTH = PANEL_RIGHT - PANEL_LEFT - 48
+TEXT_COL_LEFT = 36
+TEXT_COL_WIDTH = 500
 
 
 def load_font(size: int, bold: bool = False, italic: bool = False) -> ImageFont.FreeTypeFont:
@@ -63,74 +57,34 @@ def draw_centered(
     return y + text_height
 
 
-def draw_soft_panel(overlay: Image.Image) -> None:
-    """Light frosted panel (reference style) with soft fade into the photo."""
-    panel = Image.new("RGBA", (WIDTH, HEIGHT), (0, 0, 0, 0))
-    draw = ImageDraw.Draw(panel)
+def add_merged_sky_wash(overlay: Image.Image) -> None:
+    """Full-height sky-white gradient into photo (no hard panel box)."""
+    wash = Image.new("RGBA", (WIDTH, HEIGHT), (0, 0, 0, 0))
+    draw = ImageDraw.Draw(wash)
+    fade_end = int(WIDTH * 0.56)
 
-    draw.rounded_rectangle(
-        (PANEL_LEFT, PANEL_TOP, PANEL_RIGHT, PANEL_BOTTOM),
-        radius=22,
-        fill=SKY_PANEL + (235,),
-    )
+    for x in range(fade_end):
+        t = x / fade_end
+        ease = (1 - t) ** 1.75
+        r = int(248 * ease + 220 * (1 - ease))
+        g = int(246 * ease + 228 * (1 - ease))
+        b = int(252 * ease + 238 * (1 - ease))
+        a = int(248 * ease)
+        draw.line([(x, 0), (x, HEIGHT)], fill=(r, g, b, a), width=1)
 
-    fade_w = 96
-    for i in range(fade_w):
-        x = PANEL_RIGHT - fade_w + i
-        t = i / fade_w
-        alpha = int(235 * (1 - t) ** 1.6)
-        draw.line(
-            [(x, PANEL_TOP), (x, PANEL_BOTTOM)],
-            fill=SKY_PANEL + (alpha,),
-            width=1,
-        )
-
-    draw.rounded_rectangle(
-        (PANEL_LEFT, PANEL_TOP, PANEL_RIGHT, PANEL_BOTTOM),
-        radius=22,
-        outline=GOLD_LIGHT + (200,),
-        width=2,
-    )
-    draw.rounded_rectangle(
-        (PANEL_LEFT + 4, PANEL_TOP + 4, PANEL_RIGHT - 4, PANEL_BOTTOM - 4),
-        radius=18,
-        outline=(255, 255, 255, 160),
-        width=1,
-    )
-
-    accent = ImageDraw.Draw(panel)
-    accent.arc(
-        (PANEL_LEFT - 6, PANEL_TOP - 6, PANEL_LEFT + 118, PANEL_TOP + 118),
-        start=200,
-        end=310,
-        fill=GOLD,
-        width=2,
-    )
-    accent.arc(
-        (PANEL_LEFT - 10, PANEL_BOTTOM - 118, PANEL_LEFT + 108, PANEL_BOTTOM + 6),
-        start=30,
-        end=140,
-        fill=GOLD_LIGHT + (220,),
-        width=2,
-    )
-    for px, py in (
-        (PANEL_LEFT + 18, PANEL_TOP + 16),
-        (PANEL_LEFT + 32, PANEL_TOP + 10),
-        (PANEL_LEFT + 46, PANEL_TOP + 18),
-        (PANEL_LEFT + 22, PANEL_BOTTOM - 20),
-        (PANEL_LEFT + 38, PANEL_BOTTOM - 14),
-    ):
-        accent.ellipse((px - 3, py - 3, px + 3, py + 3), fill=GOLD + (230,))
-
-    panel = panel.filter(ImageFilter.GaussianBlur(radius=0.6))
-    overlay.alpha_composite(panel)
+    wash = wash.filter(ImageFilter.GaussianBlur(radius=1.4))
+    overlay.alpha_composite(wash)
 
 
-def draw_outer_frame(image: Image.Image) -> Image.Image:
-    frame = image.copy()
-    draw = ImageDraw.Draw(frame)
-    draw.rounded_rectangle((5, 5, WIDTH - 5, HEIGHT - 5), radius=16, outline=GOLD + (210,), width=2)
-    return frame
+def draw_gold_swirls(overlay: Image.Image) -> None:
+    deco = Image.new("RGBA", (WIDTH, HEIGHT), (0, 0, 0, 0))
+    d = ImageDraw.Draw(deco)
+    d.arc((8, 6, 148, 146), start=210, end=328, fill=GOLD + (255,), width=2)
+    d.arc((18, 16, 128, 126), start=215, end=320, fill=GOLD + (180,), width=1)
+    d.arc((6, HEIGHT - 148, 146, HEIGHT - 8), start=32, end=148, fill=GOLD + (230,), width=2)
+    for px, py in ((28, 22), (42, 14), (56, 24), (34, HEIGHT - 28), (48, HEIGHT - 20)):
+        d.ellipse((px - 2, py - 2, px + 2, py + 2), fill=GOLD + (240,))
+    overlay.alpha_composite(deco)
 
 
 def build_from_photo() -> Image.Image:
@@ -140,68 +94,79 @@ def build_from_photo() -> Image.Image:
         (round(photo.width * scale), round(photo.height * scale)),
         Image.LANCZOS,
     )
-    # Shift crop right so the couple sits more on the right (like reference).
-    left = max(0, (resized.width - WIDTH) // 2 + 95)
+    left = max(0, (resized.width - WIDTH) // 2 + 125)
     top = (resized.height - HEIGHT) // 2
     canvas = resized.crop((left, top, left + WIDTH, top + HEIGHT))
 
+    # Slightly soften photo so text area feels merged like reference.
+    rgb = canvas.convert("RGB")
+    rgb = ImageEnhance.Color(rgb).enhance(0.94)
+    rgb = ImageEnhance.Brightness(rgb).enhance(1.03)
+    canvas = rgb.convert("RGBA")
+
     overlay = Image.new("RGBA", (WIDTH, HEIGHT), (0, 0, 0, 0))
-    draw_soft_panel(overlay)
+    add_merged_sky_wash(overlay)
+    draw_gold_swirls(overlay)
 
     draw = ImageDraw.Draw(overlay)
-    y = PANEL_TOP + 38
+    y = 118
 
-    label_font = load_font(22)
-    name_font = load_font(68, bold=True)
-    amp_font = load_font(36, italic=True)
-    invite_font = load_font(26, bold=True)
-    date_font = load_font(34, bold=True)
-    tagline_font = load_font(30, italic=True)
+    label_font = load_font(20)
+    name_font = load_font(56, bold=True)
+    invite_font = load_font(24, bold=True)
+    date_font = load_font(22, bold=True)
+    tagline_font = load_font(28, italic=True)
 
-    y = draw_centered(draw, "THE WEDDING OF", y, label_font, GOLD + (255,), TEXT_WIDTH, TEXT_LEFT)
-    y += 12
-    y = draw_centered(draw, "Shubham", y, name_font, NAVY + (255,), TEXT_WIDTH, TEXT_LEFT)
-    y += 2
-    y = draw_centered(draw, "&", y, amp_font, GOLD + (255,), TEXT_WIDTH, TEXT_LEFT)
-    y += 0
-    y = draw_centered(draw, "Harshi", y, name_font, NAVY + (255,), TEXT_WIDTH, TEXT_LEFT)
-    y += 18
-    draw.line(
-        (TEXT_LEFT + 32, y, TEXT_LEFT + TEXT_WIDTH - 32, y),
-        fill=GOLD_LIGHT + (210,),
-        width=2,
+    y = draw_centered(
+        draw, "THE WEDDING OF", y, label_font, GOLD + (255,), TEXT_COL_WIDTH, TEXT_COL_LEFT
     )
-    y += 14
+    y += 18
+    y = draw_centered(
+        draw,
+        "Shubham & Harshi",
+        y,
+        name_font,
+        NAVY + (255,),
+        TEXT_COL_WIDTH,
+        TEXT_COL_LEFT,
+    )
+    y += 22
     y = draw_centered(
         draw,
         "WEDDING INVITATION",
         y,
         invite_font,
         NAVY + (255,),
-        TEXT_WIDTH,
-        TEXT_LEFT,
+        TEXT_COL_WIDTH,
+        TEXT_COL_LEFT,
     )
-    y += 10
-    y = draw_centered(draw, "21 NOVEMBER 2026", y, date_font, GOLD + (255,), TEXT_WIDTH, TEXT_LEFT)
-    y += 12
+    y += 16
+    y = draw_centered(
+        draw, "21 NOVEMBER 2026", y, date_font, GOLD + (255,), TEXT_COL_WIDTH, TEXT_COL_LEFT
+    )
+    y += 20
     draw_centered(
         draw,
         "With love, joy, and forever.",
         y,
         tagline_font,
-        WINE_SOFT + (255,),
-        TEXT_WIDTH,
-        TEXT_LEFT,
+        TAGLINE_BLUE + (255,),
+        TEXT_COL_WIDTH,
+        TEXT_COL_LEFT,
     )
 
     composed = Image.alpha_composite(canvas, overlay)
-    composed = draw_outer_frame(composed)
-    return composed.filter(ImageFilter.UnsharpMask(radius=1.0, percent=88, threshold=2))
+
+    frame = Image.new("RGBA", (WIDTH, HEIGHT), (255, 255, 255, 255))
+    frame.paste(composed, (0, 0), composed)
+    return frame.convert("RGB").filter(
+        ImageFilter.UnsharpMask(radius=0.9, percent=85, threshold=2)
+    )
 
 
 def main() -> None:
     image = build_from_photo()
-    image.convert("RGB").save(OUT, format="WEBP", quality=93)
+    image.save(OUT, format="WEBP", quality=93)
     print(f"Wrote {OUT}")
 
 
