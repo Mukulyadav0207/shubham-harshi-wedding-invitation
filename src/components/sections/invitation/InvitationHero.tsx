@@ -468,17 +468,25 @@ export default function InvitationHero({
     let logoRatio = 0;
 
     const publishZone = () => {
-      if (logoRatio >= 0.22) {
+      const spiritualRect = spiritual.getBoundingClientRect();
+      const logoRect = logo.getBoundingClientRect();
+      const vh = window.innerHeight;
+
+      const inviteLogoReached =
+        logoRatio >= 0.12 ||
+        (logoRect.top < vh * 0.78 &&
+          logoRect.bottom > 24 &&
+          logoRect.height > 0);
+
+      const spiritualMostlyPast = spiritualRect.bottom < vh * 0.22;
+
+      if (inviteLogoReached || spiritualMostlyPast) {
         onAudioZoneChange("invitation");
         return;
       }
-      if (spiritualRatio >= 0.08) {
+
+      if (spiritualRatio >= 0.06 || spiritualRect.bottom > vh * 0.4) {
         onAudioZoneChange("spiritual");
-        return;
-      }
-      const spiritualBottom = spiritual.getBoundingClientRect().bottom;
-      if (spiritualBottom < window.innerHeight * 0.12) {
-        onAudioZoneChange("invitation");
       }
     };
 
@@ -490,13 +498,21 @@ export default function InvitationHero({
         }
         publishZone();
       },
-      { threshold: [0, 0.08, 0.2, 0.35, 0.55, 0.75, 1] },
+      { threshold: [0, 0.06, 0.12, 0.2, 0.35, 0.55, 0.75, 1] },
     );
 
     observer.observe(spiritual);
     observer.observe(logo);
     publishZone();
-    return () => observer.disconnect();
+
+    window.addEventListener("scroll", publishZone, { passive: true });
+    window.addEventListener("resize", publishZone, { passive: true });
+
+    return () => {
+      observer.disconnect();
+      window.removeEventListener("scroll", publishZone);
+      window.removeEventListener("resize", publishZone);
+    };
   }, [cinematic, onAudioZoneChange, showSpiritual]);
 
   useEffect(() => {

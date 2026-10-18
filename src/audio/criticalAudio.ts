@@ -1,10 +1,14 @@
 import { prefersMobileWebKitMotion } from "@/lib/motion";
 import { vivahTrace } from "@/lib/vivahTrace";
+import {
+  MANTRA_PLAYBACK_TRIM_END_SEC,
+  MANTRA_PLAYBACK_TRIM_START_SEC,
+} from "@/components/sections/ganesha/mantraSync";
+
+export { MANTRA_PLAYBACK_TRIM_END_SEC, MANTRA_PLAYBACK_TRIM_START_SEC };
 
 export const SHANK_AUDIO_SRC = "/assets/audio/shankh-sound.mp3";
 export const MANTRA_AUDIO_SRC = "/assets/audio/navkar-mantra.mp3";
-/** Skip intro junk (~2 stray words) before णमो; keep in sync with mantraTimings offsets. */
-export const MANTRA_PLAYBACK_TRIM_START_SEC = 2;
 export const POP_AUDIO_SRC = "/assets/audio/pop.mp3";
 export const APPLAUSE_AUDIO_SRC = "/assets/audio/applause.mp3";
 
@@ -17,7 +21,9 @@ let shankContext: AudioContext | null = null;
 let shankBuffer: AudioBuffer | null = null;
 let shankLoadPromise: Promise<void> | null = null;
 let shankSource: AudioBufferSourceNode | null = null;
+let shankGain: GainNode | null = null;
 let shankHtmlFallback: HTMLAudioElement | null = null;
+let shankHtmlFadeTimer: number | null = null;
 
 let mantraAudio: HTMLAudioElement | null = null;
 let mantraBuffer: AudioBuffer | null = null;
@@ -26,11 +32,14 @@ let mantraSource: AudioBufferSourceNode | null = null;
 let mantraGain: GainNode | null = null;
 let mantraPlaybackStartTime = 0;
 let mantraPerformanceStart = 0;
+let mantraPlaybackEndedElapsed = 0;
+let mantraScheduledPlayDuration = 0;
 let mantraPlaybackActive = false;
 let mantraHtmlPrimePromise: Promise<void> | null = null;
 let mantraHtmlFadeTimer: number | null = null;
 
 const MANTRA_FADE_IN_SEC = 0.35;
+const SHANK_MANTRA_CROSSFADE_SEC = 1.35;
 
 let popAudio: HTMLAudioElement | null = null;
 let applauseAudio: HTMLAudioElement | null = null;
@@ -52,6 +61,38 @@ export function createBufferedAudio(src: string, loop = false) {
 
 function mantraHtmlSeekTarget() {
   return MANTRA_PLAYBACK_TRIM_START_SEC;
+}
+
+function mantraFileDurationSeconds(): number {
+  if (mantraBuffer && Number.isFinite(mantraBuffer.duration)) {
+    return mantraBuffer.duration;
+  }
+  if (
+    mantraAudio &&
+    Number.isFinite(mantraAudio.duration) &&
+    mantraAudio.duration > 0
+  ) {
+    return mantraAudio.duration;
+  }
+  return 0;
+}
+
+/** Last sample index to play (file time). */
+export function getMantraPlaybackTrimEndSec(fileDuration = mantraFileDurationSeconds()) {
+  const start = MANTRA_PLAYBACK_TRIM_START_SEC;
+  let end = MANTRA_PLAYBACK_TRIM_END_SEC;
+  if (!Number.isFinite(end) || end <= start) {
+    end = fileDuration > 0 ? fileDuration : start + 54;
+  }
+  if (fileDuration > 0) end = Math.min(end, fileDuration);
+  return end;
+}
+
+export function getMantraPlaybackSpanSec(fileDuration = mantraFileDurationSeconds()) {
+  return Math.max(
+    0,
+    getMantraPlaybackTrimEndSec(fileDuration) - MANTRA_PLAYBACK_TRIM_START_SEC,
+  );
 }
 
 /** Wait until HTMLAudio is paused at the mantra trim point (in-sync start). */
@@ -80,7 +121,9 @@ export function seekMantraHtmlToStart(audio: HTMLAudioElement): Promise<void> {
 
 /** Elapsed seconds for lyric sync (0 = first णमो line at trim point). */
 export function getMantraHtmlPlaybackElapsed(audio: HTMLAudioElement): number {
-  return Math.max(0, audio.currentTime - MANTRA_PLAYBACK_TRIM_START_SEC);
+  const raw = Math.max(0, audio.currentTime - MANTRA_PLAYBACK_TRIM_START_SEC);
+  const span = getMantraPlaybackSpanSec(audio.duration);
+  return span > 0 ? Math.min(raw, span) : raw;
 }
 
 /**
@@ -308,22 +351,45 @@ export function ensureMantraAudioReady(): Promise<void> {
 function resetMantraPlaybackClock() {
   mantraPlaybackStartTime = 0;
   mantraPerformanceStart = 0;
+  mantraPlaybackEndedElapsed = 0;
+  mantraScheduledPlayDuration = 0;
 }
 
-/** Elapsed mantra seconds from Web Audio playback (0 if not playing). */
+/** Elapsed mantra seconds from Web Audio playback (trim-aligned timeline). */
 export function getMantraPlaybackElapsed(): number {
-  if (!mantraSource) return 0;
   if (
+    mantraSource &&
     shankContext &&
-    shankContext.state === "running" &&
     mantraPlaybackStartTime > 0
   ) {
-    return Math.max(0, shankContext.currentTime - mantraPlaybackStartTime);
+    const live = Math.max(0, shankContext.currentTime - mantraPlaybackStartTime);
+    mantraPlaybackEndedElapsed = live;
+    return live;
+  }
+  if (mantraPlaybackEndedElapsed > 0) {
+    return mantraPlaybackEndedElapsed;
   }
   if (mantraPerformanceStart > 0) {
     return (performance.now() - mantraPerformanceStart) / 1000;
   }
   return 0;
+}
+
+/** Single lyric-sync clock for mantra writing (Web Audio + HTML). */
+export function getMantraSyncElapsed(): number {
+  const span = getMantraPlaybackSpanSec();
+  let elapsed = 0;
+
+  if (mantraSource && shankContext && mantraPlaybackStartTime > 0) {
+    elapsed = Math.max(0, shankContext.currentTime - mantraPlaybackStartTime);
+  } else if (mantraPlaybackActive && mantraAudio) {
+    elapsed = getMantraHtmlPlaybackElapsed(mantraAudio);
+  } else if (mantraPlaybackEndedElapsed > 0) {
+    elapsed = mantraPlaybackEndedElapsed;
+  }
+
+  if (span > 0) return Math.min(elapsed, span);
+  return elapsed;
 }
 
 export function getMantraAudioDuration(): number {
@@ -337,8 +403,8 @@ export function getMantraAudioDuration(): number {
   ) {
     full = mantraAudio.duration;
   }
-  if (full <= 0) return 0;
-  return Math.max(0, full - MANTRA_PLAYBACK_TRIM_START_SEC);
+  if (full <= 0) return getMantraPlaybackSpanSec(0);
+  return getMantraPlaybackSpanSec(full);
 }
 
 /**
@@ -363,21 +429,27 @@ export function playMantraCue(
 
   stopMantraWebAudio();
   resetMantraPlaybackClock();
+  crossfadeShankIntoMantra(SHANK_MANTRA_CROSSFADE_SEC);
 
   const source = shankContext.createBufferSource();
   source.buffer = mantraBuffer;
   const gain = shankContext.createGain();
   const now = shankContext.currentTime;
+  const fadeIn = Math.max(MANTRA_FADE_IN_SEC, SHANK_MANTRA_CROSSFADE_SEC);
   gain.gain.setValueAtTime(0, now);
-  gain.gain.linearRampToValueAtTime(vol, now + MANTRA_FADE_IN_SEC);
+  gain.gain.linearRampToValueAtTime(vol, now + fadeIn);
   source.connect(gain);
   gain.connect(shankContext.destination);
   mantraSource = source;
   mantraGain = gain;
   source.onended = () => {
+    if (mantraScheduledPlayDuration > 0) {
+      mantraPlaybackEndedElapsed = mantraScheduledPlayDuration;
+    }
     mantraSource = null;
     mantraGain = null;
-    resetMantraPlaybackClock();
+    mantraPlaybackStartTime = 0;
+    mantraPerformanceStart = 0;
     vivahTrace("audio-ended", { track: "mantra", engine: "webaudio" });
     onEnded?.();
   };
@@ -387,12 +459,11 @@ export function playMantraCue(
     mantraPlaybackStartTime = shankContext.currentTime;
     mantraPerformanceStart = performance.now();
     const offset = MANTRA_PLAYBACK_TRIM_START_SEC;
-    const playDuration =
-      mantraBuffer && Number.isFinite(mantraBuffer.duration)
-        ? Math.max(0, mantraBuffer.duration - offset)
-        : undefined;
-    if (playDuration !== undefined && playDuration > 0) {
-      mantraSource.start(0, offset, playDuration);
+    const fileDuration = mantraBuffer?.duration ?? 0;
+    const playEnd = getMantraPlaybackTrimEndSec(fileDuration);
+    mantraScheduledPlayDuration = Math.max(0, playEnd - offset);
+    if (mantraScheduledPlayDuration > 0) {
+      mantraSource.start(0, offset, mantraScheduledPlayDuration);
     } else {
       mantraSource.start(0, offset);
     }
@@ -446,24 +517,65 @@ export async function playMantraHtml(
   audio.loop = false;
   audio.muted = false;
   await seekMantraHtmlToStart(audio);
+  crossfadeShankIntoMantra(SHANK_MANTRA_CROSSFADE_SEC);
+
+  const trimEnd = getMantraPlaybackTrimEndSec(audio.duration);
+  const useTrimStop =
+    Number.isFinite(audio.duration) &&
+    audio.duration > 0 &&
+    trimEnd < audio.duration - 0.08;
+
+  let endedFired = false;
+  const fireEnded = () => {
+    if (endedFired) return;
+    endedFired = true;
+    audio.removeEventListener("timeupdate", onTimeUpdate);
+    onEnded?.();
+  };
+
+  const onTimeUpdate = () => {
+    if (audio.currentTime >= trimEnd - 0.04) {
+      audio.pause();
+      try {
+        audio.currentTime = trimEnd;
+      } catch {
+        // ignore
+      }
+      fireEnded();
+    }
+  };
 
   if (onEnded) {
-    audio.addEventListener("ended", () => onEnded(), { once: true });
+    if (useTrimStop) {
+      audio.addEventListener("timeupdate", onTimeUpdate);
+    } else {
+      audio.addEventListener("ended", () => fireEnded(), { once: true });
+    }
   }
 
   audio.volume = 0;
+  let playbackNotified = false;
+  const notifyPlaybackStarted = () => {
+    if (playbackNotified) return;
+    playbackNotified = true;
+    registerMantraPlaybackStart();
+    vivahTrace("audio-playing", { track: "mantra", engine: "html" });
+    onStarted?.();
+  };
+  audio.addEventListener("playing", notifyPlaybackStarted, { once: true });
+
   try {
     await audio.play();
   } catch {
+    audio.removeEventListener("playing", notifyPlaybackStarted);
     vivahTrace("audio-play-failed", { track: "mantra", engine: "html" });
     return false;
   }
+  if (!playbackNotified) notifyPlaybackStarted();
 
-  registerMantraPlaybackStart();
-  vivahTrace("audio-playing", { track: "mantra", engine: "html" });
-
-  const fadeSteps = 12;
-  const stepMs = (MANTRA_FADE_IN_SEC * 1000) / fadeSteps;
+  const htmlFadeSec = Math.max(MANTRA_FADE_IN_SEC, SHANK_MANTRA_CROSSFADE_SEC);
+  const fadeSteps = 14;
+  const stepMs = (htmlFadeSec * 1000) / fadeSteps;
   let step = 0;
   if (mantraHtmlFadeTimer) window.clearInterval(mantraHtmlFadeTimer);
   mantraHtmlFadeTimer = window.setInterval(() => {
@@ -477,7 +589,6 @@ export async function playMantraHtml(
     }
   }, stepMs);
 
-  onStarted?.();
   return true;
 }
 
@@ -515,11 +626,54 @@ function stopShankWebAudio() {
     // already stopped
   }
   shankSource = null;
+  shankGain = null;
+}
+
+function fadeShankHtmlVolume(targetVolume: number, durationMs: number) {
+  const track = shankHtmlFallback;
+  if (!track || track.paused) return;
+  if (shankHtmlFadeTimer) window.clearInterval(shankHtmlFadeTimer);
+  const startVolume = track.volume;
+  const steps = Math.max(6, Math.round(durationMs / 40));
+  const stepMs = durationMs / steps;
+  let step = 0;
+  shankHtmlFadeTimer = window.setInterval(() => {
+    step += 1;
+    const t = step / steps;
+    track.volume = startVolume + (targetVolume - startVolume) * t;
+    if (step >= steps) {
+      if (shankHtmlFadeTimer) window.clearInterval(shankHtmlFadeTimer);
+      shankHtmlFadeTimer = null;
+      track.volume = targetVolume;
+      if (targetVolume <= 0.001) {
+        track.pause();
+        track.currentTime = 0;
+      }
+    }
+  }, stepMs);
+}
+
+/** Overlap shank tail with mantra start so the hand-off feels like one continuous sound. */
+export function crossfadeShankIntoMantra(durationSec = SHANK_MANTRA_CROSSFADE_SEC) {
+  const duration = Math.max(0.2, durationSec);
+  if (shankGain && shankContext) {
+    const now = shankContext.currentTime;
+    shankGain.gain.cancelScheduledValues(now);
+    shankGain.gain.setValueAtTime(shankGain.gain.value, now);
+    shankGain.gain.linearRampToValueAtTime(0, now + duration);
+    window.setTimeout(() => stopShankWebAudio(), duration * 1000 + 80);
+    return;
+  }
+  fadeShankHtmlVolume(0, duration * 1000);
 }
 
 /** Stop shank from Web Audio or HTML fallback (e.g. site mute during envelope open). */
 export function stopShankPlayback() {
   stopShankWebAudio();
+  if (shankHtmlFadeTimer) {
+    window.clearInterval(shankHtmlFadeTimer);
+    shankHtmlFadeTimer = null;
+  }
   if (!shankHtmlFallback) return;
   shankHtmlFallback.pause();
   shankHtmlFallback.currentTime = 0;
@@ -538,6 +692,7 @@ function playShankWebAudio(volume: number) {
   source.connect(gain);
   gain.connect(shankContext.destination);
   shankSource = source;
+  shankGain = gain;
   source.onended = () => {
     shankSource = null;
     vivahTrace("audio-ended", { track: "shank", engine: "webaudio" });

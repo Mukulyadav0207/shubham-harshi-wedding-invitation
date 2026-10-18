@@ -14,9 +14,9 @@ const siteUrl =
 
 export const metadata: Metadata = {
   metadataBase: new URL(siteUrl),
-  title: "Shubham & Harshi — Wedding Invitation",
+  title: "Shubham & Harshi · Wedding Invitation",
   description:
-    "With love and joy, we invite you to celebrate the wedding of Shubham & Harshi on 21 November 2026.",
+    "You're warmly invited to celebrate with us — 21 November 2026. #shushi",
   alternates: {
     canonical: "/",
   },
@@ -30,10 +30,10 @@ export const metadata: Metadata = {
   openGraph: {
     type: "website",
     url: "/",
-    siteName: "Shubham & Harshi Wedding Invitation",
-    title: "Shubham & Harshi — Wedding Invitation",
+    siteName: "Shubham & Harshi",
+    title: "Shubham & Harshi · Wedding Invitation",
     description:
-      "With love and joy, we invite you to celebrate the wedding of Shubham & Harshi on 21 November 2026.",
+      "You're warmly invited to celebrate with us — 21 November 2026. #shushi",
     images: [
       {
         url: "/og-image.webp",
@@ -46,9 +46,9 @@ export const metadata: Metadata = {
   },
   twitter: {
     card: "summary_large_image",
-    title: "Shubham & Harshi — Wedding Invitation",
+    title: "Shubham & Harshi · Wedding Invitation",
     description:
-      "With love and joy, we invite you to celebrate the wedding of Shubham & Harshi on 21 November 2026.",
+      "You're warmly invited to celebrate with us — 21 November 2026. #shushi",
     images: [
       {
         url: "/og-image.webp",

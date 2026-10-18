@@ -35,6 +35,7 @@ import {
   resumeAudioContextOnUserGesture,
   setMantraMuted,
   setMantraPlaybackVolume,
+  stopMantraPlayback,
   stopShankPlayback,
 } from "@/audio/criticalAudio";
 import FoldedCard from "./FoldedCard";
@@ -307,8 +308,8 @@ export default function Envelope() {
       }
 
       setShowSpiritualSkip(false);
-      setMantraPlaybackVolume(0);
       stopShankPlayback();
+      stopMantraPlayback();
       startBollywoodMusic();
     },
     [startBollywoodMusic],

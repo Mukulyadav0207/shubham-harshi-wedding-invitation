@@ -5,65 +5,53 @@ import {
   acquireMantraAudio,
   ensureMantraAudioReady,
   getMantraAudioDuration,
-  getMantraPlaybackElapsed,
   playMantraCue,
   playMantraHtml,
-  getMantraHtmlPlaybackElapsed,
-  MANTRA_PLAYBACK_TRIM_START_SEC,
+  getMantraSyncElapsed,
   setMantraMuted,
   finishMantraPlaybackSession,
   stopMantraPlayback,
 } from '@/audio/criticalAudio';
 import { vivahTrace } from '@/lib/vivahTrace';
+import { mantraTimingsPlayback } from './mantraSync';
 import styles from './MantraWriting.module.css';
 
-type MantraTiming = { word: string; start: number; end: number };
+const mantraTimings = mantraTimingsPlayback;
+const NAVKAR_WHITE_LINE_COUNT = 5;
 
-/** File-time markers from navkar-mantra.mp3. Regenerate: node scripts/analyze-mantra.mjs */
-const mantraTimingsFile: readonly MantraTiming[] = [
-  { word: 'णमो अरिहंताणं', start: 0, end: 4.11 },
-  { word: 'णमो सिद्धाणं', start: 4.16, end: 8.21 },
-  { word: 'णमो आयरियाणं', start: 8.26, end: 12.05 },
-  { word: 'णमो उवज्झायाणं', start: 12.1, end: 15.88 },
-  { word: 'णमो लोए सव्व साहूणं', start: 15.93, end: 19.68 },
-  { word: 'एसो पंच णमोकारो, सव्व पाव प्पणासणो ।', start: 19.73, end: 23.48 },
-  { word: 'मंगलाणं च सव्वेसिं, पढमं हवइ मंगलम ॥', start: 23.53, end: 27.08 },
-] as const;
+/** Pause after mantra audio ends before scroll. */
+const MANTRA_COMPLETE_PAUSE_MS = 1000;
+const MANTRA_AUDIO_FALLBACK_SECONDS = 48;
 
-const trim = MANTRA_PLAYBACK_TRIM_START_SEC;
-
-/** Playback-time markers (after MANTRA_PLAYBACK_TRIM_START_SEC skip). */
-export const mantraTimings: readonly MantraTiming[] = mantraTimingsFile.map(
-  (line) => ({
-    word: line.word,
-    start: Math.max(0, line.start - trim),
-    end: Math.max(0, line.end - trim),
-  }),
-);
-
-const MANTRA_COMPLETE_PAUSE_MS = 650;
-const MANTRA_AUDIO_FALLBACK_SECONDS = 28;
 const NAVKAR_ARIA_LABEL =
   'णमो अरिहंताणं। णमो सिद्धाणं। णमो आयरियाणं। णमो उवज्झायाणं। णमो लोए सव्व साहूणं। एसो पंच णमोकारो, सव्व पाव प्पणासणो। मंगलाणं च सव्वेसिं, पढमं हवइ मंगलम॥';
-
-const NAVKAR_WHITE_LINE_COUNT = 5;
 
 type RevealState = {
   activeIndex: number;
   progress: number;
+  elapsed: number;
 };
+
+/** Ink 0–1 across the phrase window (includes trailing । / ॥). */
+function getLineInkProgress(lineIndex: number, elapsed: number): number {
+  const timing = mantraTimings[lineIndex];
+  if (!timing) return 0;
+  if (elapsed <= timing.start) return 0;
+  if (elapsed >= timing.end) return 1;
+
+  const span = Math.max(0.12, timing.end - timing.start);
+  return Math.min(1, (elapsed - timing.start) / span);
+}
 
 function getRevealState(elapsed: number): RevealState {
   let activeIndex = -1;
   for (let i = 0; i < mantraTimings.length; i += 1) {
-    if (elapsed >= mantraTimings[i].start - 0.04) activeIndex = i;
+    if (elapsed >= mantraTimings[i].start) activeIndex = i;
   }
-  if (activeIndex < 0) return { activeIndex: -1, progress: 0 };
+  if (activeIndex < 0) return { activeIndex: -1, progress: 0, elapsed };
 
-  const timing = mantraTimings[activeIndex];
-  const span = Math.max(0.2, timing.end - timing.start);
-  const progress = Math.min(1, Math.max(0, (elapsed - timing.start) / span));
-  return { activeIndex, progress };
+  const progress = getLineInkProgress(activeIndex, elapsed);
+  return { activeIndex, progress, elapsed };
 }
 
 function mantraSafetyTimeoutMs(audio?: HTMLAudioElement) {
@@ -75,19 +63,11 @@ function mantraSafetyTimeoutMs(audio?: HTMLAudioElement) {
   return Math.ceil((audioDuration + 2.5) * 1000 + MANTRA_COMPLETE_PAUSE_MS);
 }
 
-function getAudioElapsedSeconds(
-  usingWebAudio: boolean,
-  mantraAudio?: HTMLAudioElement,
-  wallClockStartedAt = 0,
-) {
+function getWritingElapsedSeconds(wallClockStartedAt = 0) {
   if (wallClockStartedAt > 0) {
     return (performance.now() - wallClockStartedAt) / 1000;
   }
-  if (usingWebAudio) return getMantraPlaybackElapsed();
-  if (mantraAudio && !mantraAudio.paused) {
-    return getMantraHtmlPlaybackElapsed(mantraAudio);
-  }
-  return 0;
+  return getMantraSyncElapsed();
 }
 
 type MantraWritingProps = {
@@ -111,8 +91,10 @@ export default function MantraWriting({
   const [reveal, setReveal] = useState<RevealState>({
     activeIndex: -1,
     progress: 0,
+    elapsed: 0,
   });
   const [showFrame, setShowFrame] = useState(false);
+  const [inkSynced, setInkSynced] = useState(false);
   const hasPlayedRef = useRef(false);
   const hasCompletedRef = useRef(false);
   const mutedRef = useRef(muted);
@@ -140,6 +122,12 @@ export default function MantraWriting({
     let playbackStarted = false;
     let usingWebAudio = false;
     let writingClockStartedAt = 0;
+    let frozenElapsed = 0;
+    let mantraAudioEnded = false;
+    let completionQueued = false;
+
+    const allLinesWritten = (elapsed: number) =>
+      elapsed >= (mantraTimings.at(-1)?.end ?? 0) - 0.02;
 
     const finish = () => {
       if (hasCompletedRef.current) return;
@@ -149,6 +137,7 @@ export default function MantraWriting({
       setReveal({
         activeIndex: mantraTimings.length - 1,
         progress: 1,
+        elapsed: Math.max(frozenElapsed, mantraTimings.at(-1)?.end ?? 0),
       });
       finishMantraPlaybackSession();
       vivahTrace('mantra-finish', { action: 'on-complete' });
@@ -156,6 +145,7 @@ export default function MantraWriting({
     };
 
     const scheduleCompletion = () => {
+      if (hasCompletedRef.current) return;
       if (safetyTimer) window.clearTimeout(safetyTimer);
       safetyTimer = window.setTimeout(finish, MANTRA_COMPLETE_PAUSE_MS);
     };
@@ -165,40 +155,53 @@ export default function MantraWriting({
       safetyTimer = window.setTimeout(finish, mantraSafetyTimeoutMs(audio));
     };
 
+    const resolvePlaybackElapsed = () => {
+      const live = getWritingElapsedSeconds(writingClockStartedAt);
+      if (live > 0) {
+        frozenElapsed = live;
+        return live;
+      }
+      return frozenElapsed;
+    };
+
+    const maybeQueueCompletion = (elapsed: number) => {
+      if (!mantraAudioEnded || completionQueued || hasCompletedRef.current) return;
+      if (allLinesWritten(elapsed)) {
+        completionQueued = true;
+        scheduleCompletion();
+      }
+    };
+
     const startRevealLoop = () => {
       const tick = () => {
         if (hasCompletedRef.current) return;
-        const elapsed = getAudioElapsedSeconds(
-          usingWebAudio,
-          mantraAudio,
-          writingClockStartedAt,
-        );
+
+        const elapsed = mantraAudioEnded ? frozenElapsed : resolvePlaybackElapsed();
+        if (!mantraAudioEnded) frozenElapsed = elapsed;
         setReveal(getRevealState(elapsed));
-        const audioDuration =
-          getMantraAudioDuration() ||
-          (mantraAudio &&
-          Number.isFinite(mantraAudio.duration) &&
-          mantraAudio.duration > 0
-            ? mantraAudio.duration
-            : 0);
-        const lastEnd = mantraTimings.at(-1)?.end ?? 0;
-        if (
-          (audioDuration > 0 && elapsed >= audioDuration - 0.05) ||
-          elapsed >= lastEnd + 0.12
-        ) {
-          scheduleCompletion();
-          return;
-        }
+        maybeQueueCompletion(elapsed);
+
         frame = window.requestAnimationFrame(tick);
       };
       frame = window.requestAnimationFrame(tick);
     };
 
     const handleAudioEnded = () => {
-      if (hasCompletedRef.current) return;
-      if (frame) window.cancelAnimationFrame(frame);
+      if (hasCompletedRef.current || mantraAudioEnded) return;
+      mantraAudioEnded = true;
+      const lastEnd = mantraTimings.at(-1)?.end ?? 0;
+      frozenElapsed = Math.max(resolvePlaybackElapsed(), lastEnd);
+      if (safetyTimer) {
+        window.clearTimeout(safetyTimer);
+        safetyTimer = undefined;
+      }
       vivahTrace('audio-ended', { track: 'mantra' });
-      setReveal({ activeIndex: mantraTimings.length - 1, progress: 1 });
+      setReveal({
+        activeIndex: mantraTimings.length - 1,
+        progress: 1,
+        elapsed: frozenElapsed,
+      });
+      completionQueued = true;
       scheduleCompletion();
     };
 
@@ -207,6 +210,7 @@ export default function MantraWriting({
       playbackStarted = true;
       mantraAudio = acquireMantraAudio() ?? undefined;
       writingClockStartedAt = 0;
+      setInkSynced(true);
       setShowFrame(true);
       onStartRef.current?.();
       startRevealLoop();
@@ -245,8 +249,10 @@ export default function MantraWriting({
       if (playTriggerRef) playTriggerRef.current = null;
       if (frame) window.cancelAnimationFrame(frame);
       if (safetyTimer) window.clearTimeout(safetyTimer);
-      stopMantraPlayback();
-      mantraAudio?.pause();
+      if (!hasCompletedRef.current) {
+        stopMantraPlayback();
+        mantraAudio?.pause();
+      }
     };
   }, [playTriggerRef]);
 
@@ -256,27 +262,31 @@ export default function MantraWriting({
   }, [active]);
 
   const renderNavkarLine = (lineIndex: number) => {
-    const { activeIndex, progress } = reveal;
+    if (!inkSynced) return null;
+    const { activeIndex, elapsed } = reveal;
     if (lineIndex > activeIndex || activeIndex < 0) return null;
 
     const timing = mantraTimings[lineIndex];
     const accent = lineIndex >= NAVKAR_WHITE_LINE_COUNT;
-    const isWriting = lineIndex === activeIndex;
-    const isComplete = lineIndex < activeIndex;
-    const clipInset = isWriting ? (1 - progress) * 100 : 0;
+    const lineProgress = getLineInkProgress(lineIndex, elapsed);
+    const isFullyWritten =
+      lineIndex < activeIndex ||
+      elapsed >= timing.end - 0.02 ||
+      lineProgress >= 0.998;
+    const clipInset = isFullyWritten ? 0 : (1 - lineProgress) * 100;
 
     return (
       <p
         key={lineIndex}
-        className={`${styles.line} ${accent ? styles.lineAccent : styles.linePrimary} ${isComplete ? styles.lineComplete : ''}`}
+        className={`${styles.line} ${accent ? styles.lineAccent : styles.linePrimary} ${isFullyWritten ? styles.lineComplete : ''}`}
         lang="sa"
       >
         <span
           className={styles.lineInk}
           style={
-            isWriting
-              ? { clipPath: `inset(0 ${clipInset}% 0 0)` }
-              : undefined
+            isFullyWritten
+              ? undefined
+              : { clipPath: `inset(0 ${clipInset}% 0 0)` }
           }
         >
           {timing.word}

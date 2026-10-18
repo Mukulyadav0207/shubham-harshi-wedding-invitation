@@ -1,4 +1,5 @@
 import fs from 'node:fs';
+import path from 'node:path';
 import decode from 'audio-decode';
 
 const WORDS = [
@@ -10,6 +11,11 @@ const WORDS = [
   'एसो पंच णमोकारो, सव्व पाव प्पणासणो ।',
   'मंगलाणं च सव्वेसिं, पढमं हवइ मंगलम ॥',
 ];
+
+const OUT_PATH = path.join(
+  process.cwd(),
+  'src/components/sections/ganesha/mantraSync.ts',
+);
 
 function splitGraphemes(text) {
   if (typeof Intl !== 'undefined' && 'Segmenter' in Intl) {
@@ -45,129 +51,118 @@ const audio = await decode(buf);
 const data = audio.channelData[0];
 const sr = audio.sampleRate;
 const hop = Math.floor(sr * 0.01);
-const energies = [];
-for (let i = 0; i < data.length; i += hop) {
-  const end = Math.min(data.length, i + hop);
-  energies.push(rms(data.subarray(i, end)));
+const frameSec = hop / sr;
+const n = Math.floor(data.length / hop);
+const energies = new Float32Array(n);
+for (let i = 0; i < n; i++) {
+  const i0 = i * hop;
+  energies[i] = rms(data.subarray(i0, Math.min(data.length, i0 + hop)));
 }
-const smoothE = smooth(Float32Array.from(energies), 6);
-const heavyE = smooth(smoothE, 20);
+const smoothE = smooth(energies, 5);
+const heavyE = smooth(smoothE, 14);
 const maxE = Math.max(...heavyE);
-const threshold = maxE * 0.12;
 const duration = data.length / sr;
 
-let speechStart = 0;
-let speechEnd = duration;
-for (let i = 0; i < heavyE.length; i++) {
-  if (heavyE[i] > threshold) {
-    speechStart = i * 0.01;
-    break;
-  }
-}
-for (let i = heavyE.length - 1; i >= 0; i--) {
-  if (heavyE[i] > threshold) {
-    speechEnd = (i + 1) * 0.01;
-    break;
-  }
+const flux = new Float32Array(n);
+for (let i = 1; i < n; i++) {
+  flux[i] = Math.max(0, smoothE[i] - smoothE[i - 1]);
 }
 
-// Pick coarse phrase onsets (min gap derived from speech length).
-const minGap = (speechEnd - speechStart) / (WORDS.length + 0.2);
-const coarseOnsets = [];
-for (let i = 2; i < smoothE.length; i++) {
-  const rise = smoothE[i] - smoothE[i - 3];
-  if (rise > maxE * 0.04 && smoothE[i] > threshold) {
-    const t = i * 0.01;
-    if (!coarseOnsets.length || t - coarseOnsets[coarseOnsets.length - 1] >= minGap) {
-      coarseOnsets.push(t);
+/** Skip instrumental pad (~0–8s): first strong vocal lift before steady chant. */
+function detectChantStartSec() {
+  const introEndIdx = Math.min(n - 1, Math.floor(6.5 / frameSec));
+  let introSum = 0;
+  for (let i = 0; i < introEndIdx; i++) introSum += heavyE[i];
+  const introMean = introSum / Math.max(1, introEndIdx);
+  const liftThr = introMean * 1.48;
+
+  const searchFrom = Math.floor(7.4 / frameSec);
+  const searchTo = Math.min(n - 1, Math.floor(10.5 / frameSec));
+
+  for (let i = searchFrom; i <= searchTo; i++) {
+    if (heavyE[i] >= liftThr && flux[i] >= maxE * 0.008) {
+      return i * frameSec;
     }
   }
+
+  let bestI = searchFrom;
+  let bestScore = -1;
+  for (let i = searchFrom; i <= searchTo; i++) {
+    const score = heavyE[i] + flux[i] * 40;
+    if (score > bestScore) {
+      bestScore = score;
+      bestI = i;
+    }
+  }
+  return bestI * frameSec;
 }
 
-const graphemeCounts = WORDS.map((word) => splitGraphemes(word).length);
-const totalGraphemes = graphemeCounts.reduce((sum, count) => sum + count, 0);
+const chantStart = detectChantStartSec();
 
-function graphemeWeightedTimings(start, end) {
-  const span = end - start;
-  let cursor = start;
-  return WORDS.map((word, index) => {
-    const wordStart = cursor;
-    const share = (graphemeCounts[index] / totalGraphemes) * span;
-    cursor += share;
-    const wordEnd = index < WORDS.length - 1 ? cursor : end;
-    return {
-      word,
-      start: +wordStart.toFixed(2),
-      end: +wordEnd.toFixed(2),
-    };
-  });
+let speechEnd = duration;
+const tailThr = maxE * 0.1;
+for (let i = heavyE.length - 1; i >= 0; i--) {
+  if (heavyE[i] > tailThr) {
+    speechEnd = (i + 1) * frameSec;
+    break;
+  }
 }
 
-function onsetAnchoredTimings() {
-  let starts = coarseOnsets.slice(0, WORDS.length);
-  if (starts.length < WORDS.length) {
-    const weighted = graphemeWeightedTimings(speechStart, speechEnd);
-    starts = weighted.map((timing) => timing.start);
-  } else if (starts.length > WORDS.length) {
-    starts = starts.slice(0, WORDS.length);
+/** Each णमो phrase: energy rise peaks (~5.2s apart in this recording). */
+function detectRisePhraseOnsets(startSec, endSec) {
+  const threshold = maxE * 0.12;
+  const minGap = 5.05;
+  const rises = [];
+  const iStart = Math.max(5, Math.floor(startSec / frameSec));
+
+  for (let i = iStart; i < n - 3; i++) {
+    const t = i * frameSec;
+    if (t > endSec - 1.5) break;
+    const rise = smoothE[i] - smoothE[i - 4];
+    if (rise > maxE * 0.032 && smoothE[i] > threshold) {
+      if (!rises.length || t - rises[rises.length - 1] >= minGap) {
+        rises.push(t);
+      }
+    }
   }
 
-  if (starts[0] > speechStart + 0.2) {
-    starts[0] = Math.max(speechStart, starts[0] - 0.12);
+  if (rises.length < WORDS.length) {
+    const phraseEst = (endSec - startSec) / WORDS.length;
+    return WORDS.map((_, k) => +(startSec + k * phraseEst).toFixed(2));
   }
 
-  return WORDS.map((word, index) => {
-    const start = index === 0 ? Math.max(speechStart, starts[index]) : starts[index];
-    const end =
-      index < WORDS.length - 1
-        ? starts[index + 1] - 0.05
-        : speechEnd - 0.35;
-    return {
-      word,
-      start: +start.toFixed(2),
-      end: +Math.max(start + 0.15, end).toFixed(2),
-    };
-  });
+  const onsets = rises.slice(0, WORDS.length);
+  onsets[0] = startSec;
+  return onsets.map((t) => +t.toFixed(2));
 }
 
-const weighted = graphemeWeightedTimings(speechStart + 0.05, speechEnd - 0.4);
-const anchored = onsetAnchoredTimings();
+const phraseOnsets = detectRisePhraseOnsets(chantStart, speechEnd - 0.3);
+const trimStart = +phraseOnsets[0].toFixed(2);
+const trimEnd = Math.min(
+  duration,
+  +(speechEnd - 0.28).toFixed(2),
+);
 
-// Blend: use onset anchors where we have them, fall back to weighted ends.
-const timings = anchored.map((timing, index) => {
-  const weight = weighted[index];
-  const start = index === 0 ? speechStart : timing.start;
+const timings = WORDS.map((word, index) => {
+  const start = +phraseOnsets[index].toFixed(2);
   const end =
     index < WORDS.length - 1
-      ? timing.end
-      : Math.max(timing.end, weight.end);
-  return {
-    word: timing.word,
-    start: +start.toFixed(2),
-    end: +end.toFixed(2),
-  };
+      ? +phraseOnsets[index + 1].toFixed(2)
+      : +trimEnd.toFixed(2);
+  return { word, start, end };
 });
 
-// Ensure monotonic non-overlapping spans.
-for (let i = 1; i < timings.length; i++) {
-  if (timings[i].start < timings[i - 1].end) {
-    timings[i].start = timings[i - 1].end + 0.02;
-  }
-  if (timings[i].end <= timings[i].start) {
-    timings[i].end = timings[i].start + 0.2;
-  }
-}
-timings[0].start = +speechStart.toFixed(2);
-timings[timings.length - 1].end = +(speechEnd - 0.25).toFixed(2);
+const graphemeCounts = WORDS.map((word) => splitGraphemes(word).length);
 
 console.log(
   JSON.stringify(
     {
       duration: +duration.toFixed(2),
-      speechStart: +speechStart.toFixed(2),
-      speechEnd: +speechEnd.toFixed(2),
-      minGap: +minGap.toFixed(2),
-      coarseOnsets: coarseOnsets.map((t) => +t.toFixed(2)),
+      chantStart: +chantStart.toFixed(2),
+      trimStart,
+      trimEnd,
+      playbackSpanSec: +(trimEnd - trimStart).toFixed(2),
+      phraseOnsets: phraseOnsets.map((t) => +t.toFixed(2)),
       graphemeCounts,
       timings,
     },
@@ -176,8 +171,29 @@ console.log(
   ),
 );
 
-console.log('\nexport const mantraTimings = [');
-for (const t of timings) {
-  console.log(`  { word: '${t.word}', start: ${t.start}, end: ${t.end} },`);
-}
-console.log('] as const;');
+const fileBody = `/** Auto-generated from public/assets/audio/navkar-mantra.mp3 — node scripts/analyze-mantra.mjs */
+
+export const MANTRA_PLAYBACK_TRIM_START_SEC = ${trimStart};
+export const MANTRA_PLAYBACK_TRIM_END_SEC = ${trimEnd};
+
+export type MantraLineTiming = { word: string; start: number; end: number };
+
+/** Absolute times in navkar-mantra.mp3 (seconds). */
+export const mantraTimingsFile: readonly MantraLineTiming[] = [
+${timings.map((t) => `  { word: '${t.word}', start: ${t.start}, end: ${t.end} },`).join('\n')}
+] as const;
+
+const trim = MANTRA_PLAYBACK_TRIM_START_SEC;
+
+/** Playback timeline: 0 = first णमो at trim. */
+export const mantraTimingsPlayback: readonly MantraLineTiming[] = mantraTimingsFile.map(
+  (line) => ({
+    word: line.word,
+    start: Math.max(0, +(line.start - trim).toFixed(2)),
+    end: Math.max(0, +(line.end - trim).toFixed(2)),
+  }),
+);
+`;
+
+fs.writeFileSync(OUT_PATH, fileBody);
+console.log(`\nWrote ${OUT_PATH}`);
