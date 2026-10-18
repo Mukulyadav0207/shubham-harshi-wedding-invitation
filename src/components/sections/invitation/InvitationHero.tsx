@@ -43,6 +43,43 @@ export function scrollToInviteHeroPresentation(
   });
 }
 
+function getLayoutViewportHeight() {
+  if (typeof window === "undefined") return 800;
+  return window.visualViewport?.height ?? window.innerHeight;
+}
+
+function getLayoutViewportWidth() {
+  if (typeof window === "undefined") return 400;
+  return window.visualViewport?.width ?? window.innerWidth;
+}
+
+/** True when the S&H invite logo is meaningfully on screen (all devices). */
+export function isInviteLogoInFocus(
+  logo: HTMLElement,
+  logoIntersectionRatio = 0,
+) {
+  const vh = getLayoutViewportHeight();
+  const vw = getLayoutViewportWidth();
+  const rect = logo.getBoundingClientRect();
+  if (rect.height < 12 || rect.width < 12) return false;
+
+  const visible =
+    rect.bottom > 12 &&
+    rect.top < vh - 12 &&
+    rect.right > 8 &&
+    rect.left < vw - 8;
+
+  if (!visible) return false;
+
+  if (logoIntersectionRatio >= 0.08) return true;
+
+  const logoTopInView = rect.top >= -rect.height * 0.35;
+  const logoReachedUpperViewport = rect.top < vh * 0.84;
+  const logoNotOnlyPeek = rect.bottom > 28;
+
+  return logoTopInView && logoReachedUpperViewport && logoNotOnlyPeek;
+}
+
 export type InvitationAudioZone = "spiritual" | "invitation";
 
 const WEDDING_DATE = new Date(2026, 10, 21, 0, 0, 0);
@@ -402,14 +439,12 @@ export default function InvitationHero({
   showSpiritual = true,
   onMantraStart,
   onAudioZoneChange,
-  onSpiritualFinished,
 }: {
   cinematic?: boolean;
   muted?: boolean;
   showSpiritual?: boolean;
   onMantraStart?: () => void;
   onAudioZoneChange?: (zone: InvitationAudioZone) => void;
-  onSpiritualFinished?: () => void;
 }) {
   const [revealed, setRevealed] = useState(false);
   const [completing, setCompleting] = useState(false);
@@ -460,35 +495,46 @@ export default function InvitationHero({
       onAudioZoneChange("invitation");
       return undefined;
     }
-    const spiritual = spiritualRef.current;
-    const logo = logoButtonRef.current;
-    if (!spiritual || !logo) return undefined;
 
     let spiritualRatio = 0;
     let logoRatio = 0;
+    let rafId = 0;
 
     const publishZone = () => {
+      const spiritual = spiritualRef.current;
+      const logo = logoButtonRef.current;
+      if (!spiritual || !logo) return;
+
+      const vh = getLayoutViewportHeight();
       const spiritualRect = spiritual.getBoundingClientRect();
-      const logoRect = logo.getBoundingClientRect();
-      const vh = window.innerHeight;
-
-      const inviteLogoReached =
-        logoRatio >= 0.12 ||
-        (logoRect.top < vh * 0.78 &&
-          logoRect.bottom > 24 &&
-          logoRect.height > 0);
-
-      const spiritualMostlyPast = spiritualRect.bottom < vh * 0.22;
+      const inviteLogoReached = isInviteLogoInFocus(logo, logoRatio);
+      const spiritualMostlyPast = spiritualRect.bottom < vh * 0.24;
 
       if (inviteLogoReached || spiritualMostlyPast) {
         onAudioZoneChange("invitation");
         return;
       }
 
-      if (spiritualRatio >= 0.06 || spiritualRect.bottom > vh * 0.4) {
+      if (spiritualRatio >= 0.05 || spiritualRect.bottom > vh * 0.38) {
         onAudioZoneChange("spiritual");
       }
     };
+
+    const schedulePublish = () => {
+      if (rafId) return;
+      rafId = window.requestAnimationFrame(() => {
+        rafId = 0;
+        publishZone();
+      });
+    };
+
+    const spiritual = spiritualRef.current;
+    const logo = logoButtonRef.current;
+    const home = document.getElementById(INVITE_HERO_SECTION_ID);
+    if (!spiritual || !logo) {
+      const retry = window.setTimeout(schedulePublish, 150);
+      return () => window.clearTimeout(retry);
+    }
 
     const observer = new IntersectionObserver(
       (entries) => {
@@ -496,22 +542,35 @@ export default function InvitationHero({
           if (entry.target === spiritual) spiritualRatio = entry.intersectionRatio;
           if (entry.target === logo) logoRatio = entry.intersectionRatio;
         }
-        publishZone();
+        schedulePublish();
       },
-      { threshold: [0, 0.06, 0.12, 0.2, 0.35, 0.55, 0.75, 1] },
+      { threshold: [0, 0.05, 0.1, 0.2, 0.35, 0.55, 0.75, 1] },
     );
 
     observer.observe(spiritual);
     observer.observe(logo);
-    publishZone();
+    if (home) observer.observe(home);
 
-    window.addEventListener("scroll", publishZone, { passive: true });
-    window.addEventListener("resize", publishZone, { passive: true });
+    schedulePublish();
+    window.setTimeout(schedulePublish, 120);
+    window.setTimeout(schedulePublish, 480);
+
+    window.addEventListener("scroll", schedulePublish, { passive: true, capture: true });
+    window.addEventListener("resize", schedulePublish, { passive: true });
+    window.addEventListener("touchmove", schedulePublish, { passive: true });
+    window.addEventListener("touchend", schedulePublish, { passive: true });
+    window.visualViewport?.addEventListener("scroll", schedulePublish, { passive: true });
+    window.visualViewport?.addEventListener("resize", schedulePublish, { passive: true });
 
     return () => {
+      if (rafId) window.cancelAnimationFrame(rafId);
       observer.disconnect();
-      window.removeEventListener("scroll", publishZone);
-      window.removeEventListener("resize", publishZone);
+      window.removeEventListener("scroll", schedulePublish, true);
+      window.removeEventListener("resize", schedulePublish);
+      window.removeEventListener("touchmove", schedulePublish);
+      window.removeEventListener("touchend", schedulePublish);
+      window.visualViewport?.removeEventListener("scroll", schedulePublish);
+      window.visualViewport?.removeEventListener("resize", schedulePublish);
     };
   }, [cinematic, onAudioZoneChange, showSpiritual]);
 
@@ -861,9 +920,9 @@ export default function InvitationHero({
               onAudioZoneChange?.("invitation");
               scrollToInviteHeroPresentation("smooth");
               window.setTimeout(() => {
-                onSpiritualFinished?.();
                 requestAnimationFrame(() => {
                   scrollToInviteHeroPresentation("auto");
+                  onAudioZoneChange?.("invitation");
                   setScrollHintPhase("hero");
                 });
               }, 880);

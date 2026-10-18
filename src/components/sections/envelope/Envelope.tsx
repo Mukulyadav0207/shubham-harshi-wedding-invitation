@@ -181,6 +181,7 @@ export default function Envelope() {
   const invitationTimerRef = useRef<number | null>(null);
   const audioZoneRef = useRef<InvitationAudioZone>("spiritual");
   const bollywoodStartedRef = useRef(false);
+  const inviteHeroReachedRef = useRef(false);
   const invitationActiveRef = useRef(false);
   const enterMainInvitationRef = useRef<() => void>(() => undefined);
   const [showSpiritualSkip, setShowSpiritualSkip] = useState(true);
@@ -263,8 +264,10 @@ export default function Envelope() {
     vivahTrace("animation", { step: "main-invitation-start" });
     masterTimeline.setPhase(MasterPhase.GaneshaReveal);
     setState("invitation");
+    setSpiritualSectionRemoved(false);
     setShowSpiritualSkip(true);
     bollywoodStartedRef.current = false;
+    inviteHeroReachedRef.current = false;
     audioZoneRef.current = "spiritual";
     resumeAudioContextOnUserGesture();
     setMantraMuted(!musicEnabledRef.current);
@@ -293,37 +296,42 @@ export default function Envelope() {
     });
   }, []);
 
+  const enterInviteHeroExperience = useCallback(() => {
+    if (!invitationActiveRef.current) return;
+    inviteHeroReachedRef.current = true;
+    audioZoneRef.current = "invitation";
+    setShowSpiritualSkip(false);
+    setSpiritualSectionRemoved(true);
+    stopShankPlayback();
+    stopMantraPlayback();
+    resumeAudioContextOnUserGesture();
+    startBollywoodMusic();
+  }, [startBollywoodMusic]);
+
   const handleInvitationAudioZone = useCallback(
     (zone: InvitationAudioZone) => {
       if (!invitationActiveRef.current) return;
-      if (audioZoneRef.current === zone) return;
-      audioZoneRef.current = zone;
 
-      if (zone === "spiritual") {
-        weddingMusicRef.current?.fadeOut(450);
-        resumeAudioContextOnUserGesture();
-        setMantraMuted(!musicEnabledRef.current);
-        masterTimeline.setPhase(MasterPhase.MantraIntro);
+      if (zone === "invitation") {
+        enterInviteHeroExperience();
         return;
       }
 
-      setShowSpiritualSkip(false);
-      stopShankPlayback();
-      stopMantraPlayback();
-      startBollywoodMusic();
-    },
-    [startBollywoodMusic],
-  );
+      if (inviteHeroReachedRef.current) return;
+      if (audioZoneRef.current === zone) return;
+      audioZoneRef.current = zone;
 
-  const removeSpiritualSection = useCallback(() => {
-    setSpiritualSectionRemoved(true);
-    setShowSpiritualSkip(false);
-  }, []);
+      weddingMusicRef.current?.fadeOut(450);
+      resumeAudioContextOnUserGesture();
+      setMantraMuted(!musicEnabledRef.current);
+      masterTimeline.setPhase(MasterPhase.MantraIntro);
+    },
+    [enterInviteHeroExperience],
+  );
 
   const skipToInviteLogo = () => {
     if (state !== "invitation") return;
-    handleInvitationAudioZone("invitation");
-    removeSpiritualSection();
+    enterInviteHeroExperience();
     requestAnimationFrame(() => {
       scrollToInviteHeroPresentation("smooth");
     });
@@ -545,7 +553,6 @@ export default function Envelope() {
           showSpiritual={!spiritualSectionRemoved}
           onMantraStart={() => weddingMusicRef.current?.fadeOut(1100)}
           onAudioZoneChange={handleInvitationAudioZone}
-          onSpiritualFinished={removeSpiritualSection}
         />
 
         {showSpiritualSkip && (

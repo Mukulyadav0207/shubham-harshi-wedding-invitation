@@ -3,7 +3,6 @@
 
 from __future__ import annotations
 
-import subprocess
 from pathlib import Path
 
 from PIL import Image, ImageDraw, ImageFont, ImageFilter
@@ -13,12 +12,15 @@ OUT = ROOT / "public" / "og-image.webp"
 PHOTO = ROOT / "public" / "assets" / "images" / "bg" / "mr-photo.webp"
 
 WIDTH, HEIGHT = 1200, 630
-GOLD = (196, 168, 118)
-GOLD_LIGHT = (232, 210, 168)
-BLUE = (58, 92, 128)
-WINE = (116, 41, 73)
-WINE_SOFT = (134, 58, 88)
-CREAM = (255, 252, 248)
+GOLD = (210, 178, 118)
+GOLD_DEEP = (176, 142, 88)
+NAVY = (42, 68, 98)
+CREAM = (255, 250, 244)
+WINE = (108, 38, 62)
+WINE_SOFT = (128, 52, 78)
+
+TEXT_LEFT = 44
+TEXT_WIDTH = 500
 
 
 def load_font(size: int, bold: bool = False, italic: bool = False) -> ImageFont.FreeTypeFont:
@@ -45,125 +47,70 @@ def draw_centered(
     text: str,
     y: int,
     font: ImageFont.FreeTypeFont,
-    fill: tuple[int, int, int],
+    fill: tuple[int, int, int, int],
     box_width: int,
     x_offset: int = 0,
+    stroke: int = 0,
+    stroke_fill: tuple[int, int, int, int] | None = None,
 ) -> int:
     bbox = draw.textbbox((0, 0), text, font=font)
     text_width = bbox[2] - bbox[0]
     text_height = bbox[3] - bbox[1]
     x = x_offset + (box_width - text_width) // 2
-    draw.text((x, y), text, font=font, fill=fill)
+    draw.text(
+        (x, y),
+        text,
+        font=font,
+        fill=fill,
+        stroke_width=stroke,
+        stroke_fill=stroke_fill,
+    )
     return y + text_height
+
+
+def add_photo_scrim() -> Image.Image:
+    """Left-to-right cream wash fading into the photo — no solid white panel."""
+    scrim = Image.new("RGBA", (WIDTH, HEIGHT), (0, 0, 0, 0))
+    draw = ImageDraw.Draw(scrim)
+    fade_end = int(WIDTH * 0.62)
+
+    for x in range(fade_end):
+        t = x / fade_end
+        ease = (1 - t) ** 2.15
+        r = int(248 * ease + 32 * (1 - ease))
+        g = int(242 * ease + 40 * (1 - ease))
+        b = int(232 * ease + 52 * (1 - ease))
+        a = int(198 * ease)
+        draw.line([(x, 0), (x, HEIGHT)], fill=(r, g, b, a), width=1)
+
+    for x in range(int(WIDTH * 0.35)):
+        t = 1 - x / (WIDTH * 0.35)
+        a = int(48 * t)
+        draw.line([(x, 0), (x, HEIGHT)], fill=(255, 252, 248, a), width=1)
+
+    return scrim.filter(ImageFilter.GaussianBlur(radius=1.2))
 
 
 def add_edge_vignette(base: Image.Image) -> Image.Image:
     vignette = Image.new("RGBA", base.size, (0, 0, 0, 0))
     draw = ImageDraw.Draw(vignette)
-    for i in range(28):
-        alpha = int(8 + i * 3.2)
-        inset = i * 5
+    for i in range(18):
+        alpha = int(6 + i * 2.8)
+        inset = i * 6
         draw.rounded_rectangle(
             (inset, inset, WIDTH - inset, HEIGHT - inset),
-            radius=max(4, 22 - i),
-            outline=(24, 36, 58, min(255, alpha)),
+            radius=max(6, 20 - i),
+            outline=(18, 28, 48, min(200, alpha)),
             width=2,
         )
     return Image.alpha_composite(base, vignette)
 
 
-def draw_frosted_panel(
-    overlay: Image.Image,
-    panel_left: int,
-    panel_top: int,
-    panel_right: int,
-    panel_bottom: int,
-    radius: int = 22,
-) -> None:
-    panel = Image.new("RGBA", overlay.size, (0, 0, 0, 0))
-    draw = ImageDraw.Draw(panel)
-
-    shadow_offset = 6
-    draw.rounded_rectangle(
-        (
-            panel_left + shadow_offset,
-            panel_top + shadow_offset,
-            panel_right + shadow_offset,
-            panel_bottom + shadow_offset,
-        ),
-        radius=radius + 2,
-        fill=(40, 52, 72, 72),
-    )
-
-    for layer, alpha in enumerate((235, 220, 200), start=0):
-        inset = layer * 2
-        draw.rounded_rectangle(
-            (
-                panel_left + inset,
-                panel_top + inset,
-                panel_right - inset,
-                panel_bottom - inset,
-            ),
-            radius=max(8, radius - inset),
-            fill=(248, 250, 252, alpha),
-        )
-
-    draw.rounded_rectangle(
-        (panel_left, panel_top, panel_right, panel_bottom),
-        radius=radius,
-        fill=(255, 255, 255, 168),
-    )
-
-    draw.rounded_rectangle(
-        (panel_left, panel_top, panel_right, panel_bottom),
-        radius=radius,
-        outline=GOLD_LIGHT + (255,),
-        width=3,
-    )
-    draw.rounded_rectangle(
-        (panel_left + 5, panel_top + 5, panel_right - 5, panel_bottom - 5),
-        radius=max(6, radius - 4),
-        outline=(255, 255, 255, 200),
-        width=1,
-    )
-    draw.rounded_rectangle(
-        (panel_left + 2, panel_top + 2, panel_right - 2, panel_bottom - 2),
-        radius=max(8, radius - 2),
-        outline=WINE + (90,),
-        width=1,
-    )
-
-    accent = ImageDraw.Draw(panel)
-    accent.line(
-        (panel_left + 28, panel_top + 28, panel_left + 118, panel_top + 28),
-        fill=GOLD,
-        width=2,
-    )
-    accent.line(
-        (panel_left + 28, panel_top + 28, panel_left + 28, panel_top + 118),
-        fill=GOLD,
-        width=2,
-    )
-    accent.ellipse(
-        (panel_left + 22, panel_top + 22, panel_left + 34, panel_top + 34),
-        outline=GOLD,
-        width=2,
-    )
-    accent.ellipse(
-        (panel_right - 34, panel_bottom - 34, panel_right - 22, panel_bottom - 22),
-        outline=GOLD_LIGHT,
-        width=2,
-    )
-
-    overlay.alpha_composite(panel)
-
-
 def draw_outer_frame(image: Image.Image) -> Image.Image:
     frame = image.copy()
     draw = ImageDraw.Draw(frame)
-    draw.rounded_rectangle((5, 5, WIDTH - 5, HEIGHT - 5), radius=20, outline=GOLD, width=4)
-    draw.rounded_rectangle((11, 11, WIDTH - 11, HEIGHT - 11), radius=16, outline=CREAM + (220,), width=2)
-    draw.rounded_rectangle((16, 16, WIDTH - 16, HEIGHT - 16), radius=14, outline=WINE + (140,), width=1)
+    draw.rounded_rectangle((4, 4, WIDTH - 4, HEIGHT - 4), radius=18, outline=GOLD_DEEP + (220,), width=3)
+    draw.rounded_rectangle((9, 9, WIDTH - 9, HEIGHT - 9), radius=14, outline=CREAM + (120,), width=1)
     return frame
 
 
@@ -177,72 +124,120 @@ def build_from_photo() -> Image.Image:
     left = max(0, (resized.width - WIDTH) // 2 - 120)
     top = (resized.height - HEIGHT) // 2
     canvas = resized.crop((left, top, left + WIDTH, top + HEIGHT))
-
     canvas = add_edge_vignette(canvas)
 
+    scrim = add_photo_scrim()
+    canvas = Image.alpha_composite(canvas, scrim)
+
     overlay = Image.new("RGBA", (WIDTH, HEIGHT), (0, 0, 0, 0))
-    panel_left = 32
-    panel_top = 28
-    panel_right = 478
-    panel_bottom = HEIGHT - 28
-    draw_frosted_panel(overlay, panel_left, panel_top, panel_right, panel_bottom, radius=24)
+    accent = ImageDraw.Draw(overlay)
+    accent.line((TEXT_LEFT + 8, 36, TEXT_LEFT + 8, HEIGHT - 36), fill=GOLD + (160,), width=2)
+    accent.line((TEXT_LEFT + 8, 36, TEXT_LEFT + 88, 36), fill=GOLD + (180,), width=2)
 
     draw = ImageDraw.Draw(overlay)
-    text_left = panel_left + 36
-    text_width = panel_right - panel_left - 72
-    y = panel_top + 52
+    shadow = (24, 36, 52, 100)
+    y = 52
 
-    label_font = load_font(19)
-    name_font = load_font(60, bold=True)
-    amp_font = load_font(32, italic=True)
-    invite_font = load_font(21, bold=True)
-    date_font = load_font(26, bold=True)
-    tagline_font = load_font(28, italic=True)
+    label_font = load_font(24)
+    name_font = load_font(76, bold=True)
+    amp_font = load_font(40, italic=True)
+    invite_font = load_font(28, bold=True)
+    date_font = load_font(36, bold=True)
+    tagline_font = load_font(32, italic=True)
 
-    y = draw_centered(draw, "THE WEDDING OF", y, label_font, GOLD, text_width, text_left)
-    y += 16
-    y = draw_centered(draw, "Shubham", y, name_font, BLUE, text_width, text_left)
-    y += 6
-    y = draw_centered(draw, "&", y, amp_font, GOLD, text_width, text_left)
-    y += 4
-    y = draw_centered(draw, "Harshi", y, name_font, BLUE, text_width, text_left)
-    y += 22
-    draw.line(
-        (text_left + 40, y, text_left + text_width - 40, y),
-        fill=GOLD_LIGHT + (200,),
-        width=1,
+    y = draw_centered(
+        draw,
+        "THE WEDDING OF",
+        y,
+        label_font,
+        GOLD,
+        TEXT_WIDTH,
+        TEXT_LEFT,
+        stroke=1,
+        stroke_fill=shadow,
     )
     y += 14
-    y = draw_centered(draw, "WEDDING INVITATION", y, invite_font, WINE, text_width, text_left)
-    y += 14
-    y = draw_centered(draw, "21 NOVEMBER 2026", y, date_font, GOLD, text_width, text_left)
+    y = draw_centered(
+        draw,
+        "Shubham",
+        y,
+        name_font,
+        NAVY,
+        TEXT_WIDTH,
+        TEXT_LEFT,
+        stroke=2,
+        stroke_fill=shadow,
+    )
+    y += 4
+    y = draw_centered(
+        draw,
+        "&",
+        y,
+        amp_font,
+        GOLD_DEEP,
+        TEXT_WIDTH,
+        TEXT_LEFT,
+        stroke=1,
+        stroke_fill=shadow,
+    )
+    y += 2
+    y = draw_centered(
+        draw,
+        "Harshi",
+        y,
+        name_font,
+        NAVY,
+        TEXT_WIDTH,
+        TEXT_LEFT,
+        stroke=2,
+        stroke_fill=shadow,
+    )
+    y += 20
+    draw.line(
+        (TEXT_LEFT + 24, y, TEXT_LEFT + TEXT_WIDTH - 24, y),
+        fill=GOLD + (200,),
+        width=2,
+    )
     y += 16
+    y = draw_centered(
+        draw,
+        "WEDDING INVITATION",
+        y,
+        invite_font,
+        WINE,
+        TEXT_WIDTH,
+        TEXT_LEFT,
+        stroke=1,
+        stroke_fill=shadow,
+    )
+    y += 12
+    y = draw_centered(
+        draw,
+        "21 NOVEMBER 2026",
+        y,
+        date_font,
+        GOLD,
+        TEXT_WIDTH,
+        TEXT_LEFT,
+        stroke=2,
+        stroke_fill=shadow,
+    )
+    y += 14
     draw_centered(
         draw,
         "With love, joy, and forever.",
         y,
         tagline_font,
         WINE_SOFT,
-        text_width,
-        text_left,
+        TEXT_WIDTH,
+        TEXT_LEFT,
+        stroke=1,
+        stroke_fill=shadow,
     )
 
     composed = Image.alpha_composite(canvas, overlay)
     composed = draw_outer_frame(composed)
-    return composed.filter(ImageFilter.UnsharpMask(radius=1.2, percent=85, threshold=2))
-
-
-def load_original() -> Image.Image | None:
-    try:
-        raw = subprocess.check_output(
-            ["git", "show", "2e52916:public/og-image.webp"],
-            cwd=ROOT,
-        )
-    except (subprocess.CalledProcessError, FileNotFoundError):
-        return None
-    from io import BytesIO
-
-    return Image.open(BytesIO(raw)).convert("RGBA")
+    return composed.filter(ImageFilter.UnsharpMask(radius=1.1, percent=90, threshold=2))
 
 
 def main() -> None:
