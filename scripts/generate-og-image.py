@@ -12,15 +12,19 @@ OUT = ROOT / "public" / "og-image.webp"
 PHOTO = ROOT / "public" / "assets" / "images" / "bg" / "mr-photo.webp"
 
 WIDTH, HEIGHT = 1200, 630
-GOLD = (210, 178, 118)
-GOLD_DEEP = (176, 142, 88)
-NAVY = (42, 68, 98)
-CREAM = (255, 250, 244)
+GOLD = (196, 168, 118)
+GOLD_LIGHT = (228, 204, 158)
+NAVY = (48, 78, 112)
+SKY_PANEL = (236, 244, 252)
 WINE = (108, 38, 62)
-WINE_SOFT = (128, 52, 78)
+WINE_SOFT = (124, 48, 72)
 
-TEXT_LEFT = 44
-TEXT_WIDTH = 500
+PANEL_LEFT = 24
+PANEL_TOP = 22
+PANEL_RIGHT = 542
+PANEL_BOTTOM = HEIGHT - 22
+TEXT_LEFT = 48
+TEXT_WIDTH = PANEL_RIGHT - PANEL_LEFT - 48
 
 
 def load_font(size: int, bold: bool = False, italic: bool = False) -> ImageFont.FreeTypeFont:
@@ -50,67 +54,82 @@ def draw_centered(
     fill: tuple[int, int, int, int],
     box_width: int,
     x_offset: int = 0,
-    stroke: int = 0,
-    stroke_fill: tuple[int, int, int, int] | None = None,
 ) -> int:
     bbox = draw.textbbox((0, 0), text, font=font)
     text_width = bbox[2] - bbox[0]
     text_height = bbox[3] - bbox[1]
     x = x_offset + (box_width - text_width) // 2
-    draw.text(
-        (x, y),
-        text,
-        font=font,
-        fill=fill,
-        stroke_width=stroke,
-        stroke_fill=stroke_fill,
-    )
+    draw.text((x, y), text, font=font, fill=fill)
     return y + text_height
 
 
-def add_photo_scrim() -> Image.Image:
-    """Left-to-right cream wash fading into the photo — no solid white panel."""
-    scrim = Image.new("RGBA", (WIDTH, HEIGHT), (0, 0, 0, 0))
-    draw = ImageDraw.Draw(scrim)
-    fade_end = int(WIDTH * 0.62)
+def draw_soft_panel(overlay: Image.Image) -> None:
+    """Light frosted panel (reference style) with soft fade into the photo."""
+    panel = Image.new("RGBA", (WIDTH, HEIGHT), (0, 0, 0, 0))
+    draw = ImageDraw.Draw(panel)
 
-    for x in range(fade_end):
-        t = x / fade_end
-        ease = (1 - t) ** 2.15
-        r = int(248 * ease + 32 * (1 - ease))
-        g = int(242 * ease + 40 * (1 - ease))
-        b = int(232 * ease + 52 * (1 - ease))
-        a = int(198 * ease)
-        draw.line([(x, 0), (x, HEIGHT)], fill=(r, g, b, a), width=1)
+    draw.rounded_rectangle(
+        (PANEL_LEFT, PANEL_TOP, PANEL_RIGHT, PANEL_BOTTOM),
+        radius=22,
+        fill=SKY_PANEL + (235,),
+    )
 
-    for x in range(int(WIDTH * 0.35)):
-        t = 1 - x / (WIDTH * 0.35)
-        a = int(48 * t)
-        draw.line([(x, 0), (x, HEIGHT)], fill=(255, 252, 248, a), width=1)
-
-    return scrim.filter(ImageFilter.GaussianBlur(radius=1.2))
-
-
-def add_edge_vignette(base: Image.Image) -> Image.Image:
-    vignette = Image.new("RGBA", base.size, (0, 0, 0, 0))
-    draw = ImageDraw.Draw(vignette)
-    for i in range(18):
-        alpha = int(6 + i * 2.8)
-        inset = i * 6
-        draw.rounded_rectangle(
-            (inset, inset, WIDTH - inset, HEIGHT - inset),
-            radius=max(6, 20 - i),
-            outline=(18, 28, 48, min(200, alpha)),
-            width=2,
+    fade_w = 96
+    for i in range(fade_w):
+        x = PANEL_RIGHT - fade_w + i
+        t = i / fade_w
+        alpha = int(235 * (1 - t) ** 1.6)
+        draw.line(
+            [(x, PANEL_TOP), (x, PANEL_BOTTOM)],
+            fill=SKY_PANEL + (alpha,),
+            width=1,
         )
-    return Image.alpha_composite(base, vignette)
+
+    draw.rounded_rectangle(
+        (PANEL_LEFT, PANEL_TOP, PANEL_RIGHT, PANEL_BOTTOM),
+        radius=22,
+        outline=GOLD_LIGHT + (200,),
+        width=2,
+    )
+    draw.rounded_rectangle(
+        (PANEL_LEFT + 4, PANEL_TOP + 4, PANEL_RIGHT - 4, PANEL_BOTTOM - 4),
+        radius=18,
+        outline=(255, 255, 255, 160),
+        width=1,
+    )
+
+    accent = ImageDraw.Draw(panel)
+    accent.arc(
+        (PANEL_LEFT - 6, PANEL_TOP - 6, PANEL_LEFT + 118, PANEL_TOP + 118),
+        start=200,
+        end=310,
+        fill=GOLD,
+        width=2,
+    )
+    accent.arc(
+        (PANEL_LEFT - 10, PANEL_BOTTOM - 118, PANEL_LEFT + 108, PANEL_BOTTOM + 6),
+        start=30,
+        end=140,
+        fill=GOLD_LIGHT + (220,),
+        width=2,
+    )
+    for px, py in (
+        (PANEL_LEFT + 18, PANEL_TOP + 16),
+        (PANEL_LEFT + 32, PANEL_TOP + 10),
+        (PANEL_LEFT + 46, PANEL_TOP + 18),
+        (PANEL_LEFT + 22, PANEL_BOTTOM - 20),
+        (PANEL_LEFT + 38, PANEL_BOTTOM - 14),
+    ):
+        accent.ellipse((px - 3, py - 3, px + 3, py + 3), fill=GOLD + (230,))
+
+    panel = panel.filter(ImageFilter.GaussianBlur(radius=0.6))
+    overlay.alpha_composite(panel)
 
 
 def draw_outer_frame(image: Image.Image) -> Image.Image:
     frame = image.copy()
     draw = ImageDraw.Draw(frame)
-    draw.rounded_rectangle((4, 4, WIDTH - 4, HEIGHT - 4), radius=18, outline=GOLD_DEEP + (220,), width=3)
-    draw.rounded_rectangle((9, 9, WIDTH - 9, HEIGHT - 9), radius=14, outline=CREAM + (120,), width=1)
+    draw.rounded_rectangle((5, 5, WIDTH - 5, HEIGHT - 5), radius=16, outline=GOLD + (210,), width=2)
     return frame
 
 
@@ -121,123 +140,63 @@ def build_from_photo() -> Image.Image:
         (round(photo.width * scale), round(photo.height * scale)),
         Image.LANCZOS,
     )
-    left = max(0, (resized.width - WIDTH) // 2 - 120)
+    # Shift crop right so the couple sits more on the right (like reference).
+    left = max(0, (resized.width - WIDTH) // 2 + 95)
     top = (resized.height - HEIGHT) // 2
     canvas = resized.crop((left, top, left + WIDTH, top + HEIGHT))
-    canvas = add_edge_vignette(canvas)
-
-    scrim = add_photo_scrim()
-    canvas = Image.alpha_composite(canvas, scrim)
 
     overlay = Image.new("RGBA", (WIDTH, HEIGHT), (0, 0, 0, 0))
-    accent = ImageDraw.Draw(overlay)
-    accent.line((TEXT_LEFT + 8, 36, TEXT_LEFT + 8, HEIGHT - 36), fill=GOLD + (160,), width=2)
-    accent.line((TEXT_LEFT + 8, 36, TEXT_LEFT + 88, 36), fill=GOLD + (180,), width=2)
+    draw_soft_panel(overlay)
 
     draw = ImageDraw.Draw(overlay)
-    shadow = (24, 36, 52, 100)
-    y = 52
+    y = PANEL_TOP + 38
 
-    label_font = load_font(24)
-    name_font = load_font(76, bold=True)
-    amp_font = load_font(40, italic=True)
-    invite_font = load_font(28, bold=True)
-    date_font = load_font(36, bold=True)
-    tagline_font = load_font(32, italic=True)
+    label_font = load_font(22)
+    name_font = load_font(68, bold=True)
+    amp_font = load_font(36, italic=True)
+    invite_font = load_font(26, bold=True)
+    date_font = load_font(34, bold=True)
+    tagline_font = load_font(30, italic=True)
 
-    y = draw_centered(
-        draw,
-        "THE WEDDING OF",
-        y,
-        label_font,
-        GOLD,
-        TEXT_WIDTH,
-        TEXT_LEFT,
-        stroke=1,
-        stroke_fill=shadow,
-    )
-    y += 14
-    y = draw_centered(
-        draw,
-        "Shubham",
-        y,
-        name_font,
-        NAVY,
-        TEXT_WIDTH,
-        TEXT_LEFT,
-        stroke=2,
-        stroke_fill=shadow,
-    )
-    y += 4
-    y = draw_centered(
-        draw,
-        "&",
-        y,
-        amp_font,
-        GOLD_DEEP,
-        TEXT_WIDTH,
-        TEXT_LEFT,
-        stroke=1,
-        stroke_fill=shadow,
-    )
+    y = draw_centered(draw, "THE WEDDING OF", y, label_font, GOLD + (255,), TEXT_WIDTH, TEXT_LEFT)
+    y += 12
+    y = draw_centered(draw, "Shubham", y, name_font, NAVY + (255,), TEXT_WIDTH, TEXT_LEFT)
     y += 2
-    y = draw_centered(
-        draw,
-        "Harshi",
-        y,
-        name_font,
-        NAVY,
-        TEXT_WIDTH,
-        TEXT_LEFT,
-        stroke=2,
-        stroke_fill=shadow,
-    )
-    y += 20
+    y = draw_centered(draw, "&", y, amp_font, GOLD + (255,), TEXT_WIDTH, TEXT_LEFT)
+    y += 0
+    y = draw_centered(draw, "Harshi", y, name_font, NAVY + (255,), TEXT_WIDTH, TEXT_LEFT)
+    y += 18
     draw.line(
-        (TEXT_LEFT + 24, y, TEXT_LEFT + TEXT_WIDTH - 24, y),
-        fill=GOLD + (200,),
+        (TEXT_LEFT + 32, y, TEXT_LEFT + TEXT_WIDTH - 32, y),
+        fill=GOLD_LIGHT + (210,),
         width=2,
     )
-    y += 16
+    y += 14
     y = draw_centered(
         draw,
         "WEDDING INVITATION",
         y,
         invite_font,
-        WINE,
+        NAVY + (255,),
         TEXT_WIDTH,
         TEXT_LEFT,
-        stroke=1,
-        stroke_fill=shadow,
     )
+    y += 10
+    y = draw_centered(draw, "21 NOVEMBER 2026", y, date_font, GOLD + (255,), TEXT_WIDTH, TEXT_LEFT)
     y += 12
-    y = draw_centered(
-        draw,
-        "21 NOVEMBER 2026",
-        y,
-        date_font,
-        GOLD,
-        TEXT_WIDTH,
-        TEXT_LEFT,
-        stroke=2,
-        stroke_fill=shadow,
-    )
-    y += 14
     draw_centered(
         draw,
         "With love, joy, and forever.",
         y,
         tagline_font,
-        WINE_SOFT,
+        WINE_SOFT + (255,),
         TEXT_WIDTH,
         TEXT_LEFT,
-        stroke=1,
-        stroke_fill=shadow,
     )
 
     composed = Image.alpha_composite(canvas, overlay)
     composed = draw_outer_frame(composed)
-    return composed.filter(ImageFilter.UnsharpMask(radius=1.1, percent=90, threshold=2))
+    return composed.filter(ImageFilter.UnsharpMask(radius=1.0, percent=88, threshold=2))
 
 
 def main() -> None:
