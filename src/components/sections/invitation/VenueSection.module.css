@@ -142,11 +142,9 @@
 .venueTitle {
   display: flex;
   align-items: center;
-  justify-content: flex-start;
-  gap: clamp(6px, 2.2cqw, 12px);
+  justify-content: center;
   width: 100%;
   margin: 0;
-  padding-left: 4%;
   line-height: 1;
 }
 
@@ -281,7 +279,7 @@
   align-items: center;
   justify-content: center;
   gap: clamp(3px, 1.6cqw, 7px);
-  margin-top: clamp(4px, 2.8cqw, 12px);
+  margin-top: clamp(22px, 7.5cqw, 34px);
   padding: clamp(4px, 2.4cqw, 10px) clamp(7px, 4.2cqw, 16px);
   border: 1px solid rgba(49, 74, 54, 0.35);
   border-radius: 999px;
@@ -354,6 +352,35 @@
   transition-delay: 0.44s;
 }
 
+.mapEmbed {
+  width: min(100%, 920px);
+  margin: clamp(20px, 3.2vw, 32px) auto 0;
+  overflow: hidden;
+  border: clamp(2px, 0.4vw, 3px) solid rgba(189, 134, 81, 0.62);
+  border-radius: clamp(14px, 2.2vw, 22px);
+  box-shadow:
+    0 4px 10px rgba(63, 51, 64, 0.05),
+    0 16px 32px rgba(41, 74, 104, 0.1);
+  opacity: 0;
+  transform: translate3d(0, 22px, 0);
+  transition:
+    opacity 0.9s ease,
+    transform 1s cubic-bezier(0.2, 0.75, 0.25, 1);
+}
+
+.mapEmbed iframe {
+  display: block;
+  width: 100%;
+  height: clamp(240px, 44vw, 420px);
+  border: 0;
+}
+
+.isVisible .mapEmbed {
+  opacity: 1;
+  transform: none;
+  transition-delay: 0.56s;
+}
+
 @media (max-width: 760px) {
   .section {
     --venue-side-inset: clamp(10px, 3.6vw, 18px);
@@ -374,6 +401,14 @@
     border-radius: clamp(10px, 3vw, 16px);
   }
 
+  .mapEmbed {
+    border-radius: clamp(10px, 3vw, 16px);
+  }
+
+  .mapEmbed iframe {
+    height: clamp(220px, 58vw, 320px);
+  }
+
   .venueDetailsPanel {
     top: 30%;
     right: 4%;
@@ -382,8 +417,7 @@
   }
 
   .venueTitle {
-    padding-left: 2%;
-    gap: clamp(4px, 1.8cqw, 8px);
+    justify-content: center;
   }
 
   .venueIndex {
@@ -433,7 +467,7 @@
   }
 
   .directions {
-    margin-top: 4px;
+    margin-top: clamp(18px, 5vw, 26px);
     padding: 3px 7px;
     font-size: clamp(0.32rem, 3.4cqw, 0.5rem);
     letter-spacing: 0.08em;

@@ -2,7 +2,7 @@
 
 import { useEffect, useRef } from "react";
 import { isMobileMotionViewport } from "@/lib/motion";
-import { masterTimeline, MasterPhase } from "@/animations/masterTimeline";
+import { masterTimeline } from "@/animations/masterTimeline";
 
 const colors = ["#7c2948", "#b67965", "#d1a56a", "#f4e8d6", "#9db3cb", "#c9a86c", "#e8c9a0"];
 
@@ -338,8 +338,7 @@ export default function FlowingParticles({
       );
     };
 
-    const isInvitationActive = () =>
-      masterTimeline.getPhase() >= MasterPhase.InvitationEntrance;
+    const isInvitationActive = () => masterTimeline.shouldRunDecorativeCanvas();
 
     const scrollIntensity = () => {
       const mode = masterTimeline.getDecorativeParticleMode();

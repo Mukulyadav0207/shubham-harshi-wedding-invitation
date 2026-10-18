@@ -10,13 +10,13 @@ import "./globals.css";
 const siteUrl =
   process.env.NEXT_PUBLIC_SITE_URL ??
   process.env.URL ??
-  "https://mandeep-ritika-wedding-invitation.netlify.app";
+  "https://shubham-harshi-wedding-invitation.netlify.app";
 
 export const metadata: Metadata = {
   metadataBase: new URL(siteUrl),
-  title: "Mandeep & Ritika — Wedding Invitation",
+  title: "Shubham & Harshi — Wedding Invitation",
   description:
-    "With love and joy, we invite you to celebrate the wedding of Mandeep & Ritika on 26 November 2026.",
+    "With love and joy, we invite you to celebrate the wedding of Shubham & Harshi on 21 November 2026.",
   alternates: {
     canonical: "/",
   },
@@ -30,29 +30,29 @@ export const metadata: Metadata = {
   openGraph: {
     type: "website",
     url: "/",
-    siteName: "Mandeep & Ritika Wedding Invitation",
-    title: "Mandeep & Ritika — Wedding Invitation",
+    siteName: "Shubham & Harshi Wedding Invitation",
+    title: "Shubham & Harshi — Wedding Invitation",
     description:
-      "With love and joy, we invite you to celebrate the wedding of Mandeep & Ritika on 26 November 2026.",
+      "With love and joy, we invite you to celebrate the wedding of Shubham & Harshi on 21 November 2026.",
     images: [
       {
         url: "/og-image.webp",
         width: 1200,
         height: 630,
-        alt: "Mandeep and Ritika's wedding invitation for 26 November 2026",
+        alt: "Shubham and Harshi's wedding invitation for 21 November 2026",
         type: "image/webp",
       },
     ],
   },
   twitter: {
     card: "summary_large_image",
-    title: "Mandeep & Ritika — Wedding Invitation",
+    title: "Shubham & Harshi — Wedding Invitation",
     description:
-      "With love and joy, we invite you to celebrate the wedding of Mandeep & Ritika on 26 November 2026.",
+      "With love and joy, we invite you to celebrate the wedding of Shubham & Harshi on 21 November 2026.",
     images: [
       {
         url: "/og-image.webp",
-        alt: "Mandeep and Ritika's wedding invitation for 26 November 2026",
+        alt: "Shubham and Harshi's wedding invitation for 21 November 2026",
       },
     ],
   },
@@ -83,7 +83,7 @@ export default function RootLayout({ children }: LayoutProps<"/">) {
         />
         <link
           rel="preload"
-          href="/assets/audio/ganesha-mantra.mp3"
+          href="/assets/audio/navkar-mantra.mp3"
           as="audio"
           type="audio/mpeg"
         />

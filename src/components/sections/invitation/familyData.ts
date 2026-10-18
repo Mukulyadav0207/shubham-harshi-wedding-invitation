@@ -1,11 +1,13 @@
 export type FamilyMember = {
   name: string;
   grandparentsLabel: "Grand son of" | "Grand daughter of";
-  grandparents: string;
+  grandparents: string | readonly string[];
   parentsLabel: "Son of" | "Daughter of";
   parents: string;
   siblingLabel: string;
   siblings: string;
+  extraRelationLabel?: string;
+  extraRelation?: string;
 };
 
 export const familyIntro = {
@@ -13,26 +15,34 @@ export const familyIntro = {
   title: "Introducing",
   scriptTitle: "the families",
   groom: {
-    name: "Mandeep",
+    name: "Shubham",
     grandparentsLabel: "Grand son of",
-    grandparents: "Late Dharamsingh Yadav & Late Charandai Yadav",
+    grandparents: [
+      "Late Bhagwat Prasad Ji &",
+      "Late Jaivanti Devi Ji",
+    ],
     parentsLabel: "Son of",
-    parents: "Kuldeep Singh & Mona Yadav",
-    siblingLabel: "Brother of",
-    siblings: "Mukul Yadav",
+    parents: "Shri Rajesh & Sunita",
+    siblingLabel: "Brother & Sister in law",
+    siblings: "Rishabh & Shweta",
+    extraRelationLabel: "Our little niece",
+    extraRelation: "Shrisha",
   },
   bride: {
-    name: "Ritika",
+    name: "Harshi",
     grandparentsLabel: "Grand daughter of",
-    grandparents: "Late Ramkishan Yadav & Anguri Devi",
+    grandparents: [
+      "Late Prakash Chand Ji &",
+      "Late Basant Rani Ji",
+    ],
     parentsLabel: "Daughter of",
-    parents: "Bhanwar Singh & Kavita Yadav",
+    parents: "Shri Rahul & Rajul",
     siblingLabel: "Sister of",
-    siblings: "Tarun Yadav",
+    siblings: "Harshit",
   },
   monogram: {
-    left: "M",
-    right: "R",
+    left: "S",
+    right: "H",
   },
   footer: {
     lines: ["Raised with love,", "United by destiny,"],

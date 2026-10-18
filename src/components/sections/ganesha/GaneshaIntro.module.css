@@ -11,6 +11,112 @@
   background: #1c120d;
 }
 
+.ganeshaIntro.embedded {
+  position: relative;
+  z-index: 1;
+  inset: auto;
+  min-height: 100svh;
+  width: 100%;
+  pointer-events: auto;
+  opacity: 1;
+  overflow: visible;
+  isolation: auto;
+  background: transparent;
+}
+
+.ganeshaIntro.embedded .ambientBackground,
+.ganeshaIntro.embedded .ambientParticles,
+.ganeshaIntro.embedded .goldenLight,
+.ganeshaIntro.embedded .divineLight {
+  display: none;
+}
+
+.ganeshaIntro.embedded .invitationPage {
+  display: flex;
+  flex-direction: column;
+  align-items: center;
+  width: 100%;
+  max-width: none;
+  aspect-ratio: auto;
+  height: auto;
+  min-height: 100svh;
+  background: transparent;
+  box-shadow: none;
+  overflow: visible;
+  container-type: inline-size;
+}
+
+.ganeshaIntro.embedded .spiritualPanel {
+  position: relative;
+  z-index: 2;
+  display: flex;
+  flex-direction: column;
+  align-items: center;
+  width: min(98%, 38rem);
+  margin: 0 auto clamp(24px, 6vh, 56px);
+  padding:
+    clamp(28px, 6vh, 44px)
+    clamp(14px, 4vw, 26px)
+    clamp(20px, 5vh, 36px);
+}
+
+.ganeshaIntro.embedded .spiritualPanel::before {
+  content: "";
+  position: absolute;
+  z-index: -1;
+  inset: 0;
+  border-radius: 28px;
+  pointer-events: none;
+  opacity: 0;
+  background:
+    radial-gradient(
+      ellipse 92% 90% at 50% 42%,
+      rgba(210, 226, 248, 0.4) 0%,
+      rgba(192, 212, 238, 0.22) 48%,
+      rgba(192, 212, 238, 0) 82%
+    ),
+    linear-gradient(
+      180deg,
+      rgba(255, 255, 255, 0.14) 0%,
+      transparent 42%,
+      rgba(100, 130, 170, 0.04) 100%
+    );
+  -webkit-backdrop-filter: blur(11px) saturate(1.03);
+  backdrop-filter: blur(11px) saturate(1.03);
+  box-shadow:
+    inset 0 1px 0 rgba(255, 255, 255, 0.42),
+    inset 0 -14px 28px rgba(88, 118, 158, 0.06),
+    0 10px 36px rgba(72, 102, 142, 0.07);
+  -webkit-mask-image: radial-gradient(
+    ellipse 98% 96% at 50% 46%,
+    #000 54%,
+    transparent 100%
+  );
+  mask-image: radial-gradient(
+    ellipse 98% 96% at 50% 46%,
+    #000 54%,
+    transparent 100%
+  );
+  transition: opacity 0.55s ease;
+}
+
+.ganeshaIntro.embedded .spiritualPanelLive::before {
+  opacity: 1;
+}
+
+.ganeshaIntro.embedded .ganeshaFigureZone {
+  position: relative;
+  top: auto;
+  left: auto;
+  right: auto;
+  height: auto;
+  min-height: auto;
+  justify-content: flex-start;
+  width: 100%;
+  padding: 0 0 clamp(4px, 1vh, 10px);
+  gap: clamp(6px, 1.6vh, 14px);
+}
+
 .goldenLight {
   position: absolute;
   z-index: 1;
@@ -262,7 +368,7 @@
 .ganeshaArtworkWrap {
   position: relative;
   z-index: 5;
-  width: min(68%, 400px);
+  width: min(52%, 320px);
   margin-inline: auto;
   flex-shrink: 0;
   pointer-events: none;
@@ -329,10 +435,10 @@
 
 .ganeshaPrayer {
   position: relative;
-  z-index: 2;
+  z-index: 6;
   top: auto;
   left: auto;
-  margin: 0;
+  margin: 0 0 clamp(4px, 1.2cqh, 12px);
   flex-shrink: 0;
   color: #9b6530;
   font-family:
@@ -386,6 +492,13 @@
     box-shadow: none;
   }
 
+  .ganeshaIntro.embedded .invitationPage {
+    width: 100%;
+    height: auto;
+    min-height: 100svh;
+    min-height: 100dvh;
+  }
+
   .pageArtwork {
     object-fit: cover;
   }
@@ -424,7 +537,7 @@
   }
 
   .ganeshaArtworkWrap {
-    width: min(64%, 340px);
+    width: min(50%, 280px);
   }
 
   .goldenLight {

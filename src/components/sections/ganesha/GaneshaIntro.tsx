@@ -15,6 +15,8 @@ type GaneshaIntroProps = {
   onComplete?: () => void;
   onMantraStart?: () => void;
   dissolving?: boolean;
+  /** In-document spiritual block above the invite hero (scrollable site). */
+  layout?: 'overlay' | 'embedded';
 };
 
 /** The sacred invitation page that emerges from the envelope's final light. */
@@ -24,7 +26,9 @@ export default function GaneshaIntro({
   onComplete,
   onMantraStart,
   dissolving = false,
+  layout = 'overlay',
 }: GaneshaIntroProps) {
+  const embedded = layout === 'embedded';
   const rootRef = useRef<HTMLElement>(null);
   const pageRef = useRef<HTMLDivElement>(null);
   const ganeshaMotionRef = useRef<HTMLDivElement>(null);
@@ -66,52 +70,98 @@ export default function GaneshaIntro({
     if (active) playRef.current?.();
   }, [active]);
 
-  return <section ref={rootRef} className={`${styles.ganeshaIntro} ${dissolving ? styles.dissolving : ''}`} aria-hidden={!active}>
+  return (
+    <section
+      ref={rootRef}
+      id={embedded ? 'spiritual' : undefined}
+      className={`${styles.ganeshaIntro} ${embedded ? styles.embedded : ''} ${dissolving ? styles.dissolving : ''}`}
+      aria-hidden={embedded ? undefined : !active}
+    >
     <span ref={goldenLightRef} className={styles.goldenLight} aria-hidden="true" />
     <span className={styles.ambientBackground} aria-hidden="true" />
     <div className={styles.ambientParticles} aria-hidden="true">
       {Array.from({ length: 16 }, (_, index) => <span key={index} />)}
     </div>
     <div ref={pageRef} className={styles.invitationPage}>
-      <Image
-        className={styles.pageArtwork}
-        src="/assets/images/ganesha/ganesha-bg-page.webp"
-        width={941}
-        height={1672}
-        alt=""
-        priority
-        sizes="(max-width: 760px) 100vw, 560px"
-      />
+      {!embedded && (
+        <Image
+          className={styles.pageArtwork}
+          src="/assets/images/ganesha/ganesha-bg-page.webp"
+          width={941}
+          height={1672}
+          alt=""
+          priority
+          sizes="(max-width: 760px) 100vw, 560px"
+        />
+      )}
       <span
         className={`${styles.divineLight} ${active && !dissolving && !mantraActive ? styles.divineLightLive : ""}`}
         aria-hidden="true"
       />
-      <div className={styles.ganeshaFigureZone}>
-        <span ref={haloRef} className={styles.ganeshaHalo} aria-hidden="true" />
-        <div ref={ganeshaMotionRef} className={styles.ganeshaArtworkWrap}>
-          <Image
-            className={styles.ganeshaArtwork}
-            src="/assets/images/ganesha/ganesha.webp"
-            width={1184}
-            height={1328}
-            alt="Ganesha"
-            priority
-            sizes="(max-width: 760px) 72vw, 400px"
+      {embedded ? (
+        <div
+          className={`${styles.spiritualPanel} ${prayerVisible ? styles.spiritualPanelLive : ''}`}
+        >
+          <div className={styles.ganeshaFigureZone}>
+            <span ref={haloRef} className={styles.ganeshaHalo} aria-hidden="true" />
+            {prayerVisible && (
+              <p className={styles.ganeshaPrayer} lang="sa">
+                श्री महावीराय नमः
+              </p>
+            )}
+            <div ref={ganeshaMotionRef} className={styles.ganeshaArtworkWrap}>
+              <Image
+                className={styles.ganeshaArtwork}
+                src="/assets/images/ganesha/mahavir-bhagwan.webp"
+                width={1024}
+                height={1536}
+                alt="Bhagwan Mahavir"
+                priority
+                sizes="(max-width: 760px) 72vw, 400px"
+              />
+            </div>
+          </div>
+          <MantraWriting
+            layout="embedded"
+            active={mantraActive}
+            muted={muted}
+            playTriggerRef={playMantraRef}
+            onStart={onMantraStart}
+            onComplete={onComplete}
           />
         </div>
-        {prayerVisible && (
-          <p className={styles.ganeshaPrayer} lang="sa">
-            ॐ श्री गणेशाय नमः
-          </p>
-        )}
-      </div>
-      <MantraWriting
-        active={mantraActive}
-        muted={muted}
-        playTriggerRef={playMantraRef}
-        onStart={onMantraStart}
-        onComplete={onComplete}
-      />
+      ) : (
+        <>
+          <div className={styles.ganeshaFigureZone}>
+            <span ref={haloRef} className={styles.ganeshaHalo} aria-hidden="true" />
+            {prayerVisible && (
+              <p className={styles.ganeshaPrayer} lang="sa">
+                श्री महावीराय नमः
+              </p>
+            )}
+            <div ref={ganeshaMotionRef} className={styles.ganeshaArtworkWrap}>
+              <Image
+                className={styles.ganeshaArtwork}
+                src="/assets/images/ganesha/mahavir-bhagwan.webp"
+                width={1024}
+                height={1536}
+                alt="Bhagwan Mahavir"
+                priority
+                sizes="(max-width: 760px) 72vw, 400px"
+              />
+            </div>
+          </div>
+          <MantraWriting
+            layout="overlay"
+            active={mantraActive}
+            muted={muted}
+            playTriggerRef={playMantraRef}
+            onStart={onMantraStart}
+            onComplete={onComplete}
+          />
+        </>
+      )}
     </div>
-  </section>;
+  </section>
+  );
 }

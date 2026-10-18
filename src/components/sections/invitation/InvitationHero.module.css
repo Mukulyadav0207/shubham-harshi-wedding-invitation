@@ -1,7 +1,8 @@
 .invitation {
   position: relative;
   min-height: 100svh;
-  overflow: clip;
+  overflow-x: clip;
+  overflow-y: visible;
   overscroll-behavior: none;
   color: #491f2d;
   font-family: Georgia, "Times New Roman", serif;
@@ -9,6 +10,12 @@
 
 .withNav {
   padding-top: max(68px, calc(12px + env(safe-area-inset-top) + 44px));
+}
+
+.spiritualAnchor {
+  position: relative;
+  z-index: 4;
+  width: 100%;
 }
 
 .background {
@@ -36,6 +43,7 @@
   min-height: 100svh;
   margin: auto;
   padding: clamp(48px, 8vw, 116px) 0 50px;
+  scroll-margin-top: max(clamp(12px, 2.5vh, 28px), env(safe-area-inset-top, 0px));
   display: grid;
   grid-template-columns: minmax(0, 0.96fr) minmax(340px, 0.92fr);
   grid-template-areas: "copy visual" "countdown visual";
@@ -65,6 +73,7 @@
   background: transparent;
   cursor: pointer;
   touch-action: manipulation;
+  scroll-margin-top: max(20px, env(safe-area-inset-top));
   animation: logo-arrive 0.85s ease-out both;
 }
 .logoMotion {
@@ -580,9 +589,8 @@
 }
 
 .ambientCanvas {
-  /* One fixed layer continues across the whole invitation, above every
-     section background but below its interactive content. */
-  z-index: 3;
+  /* Fixed layer above the hero background, below section content (Ganesha card, hero, etc.). */
+  z-index: 2;
   transform: translateZ(0);
   -webkit-transform: translateZ(0);
   backface-visibility: hidden;

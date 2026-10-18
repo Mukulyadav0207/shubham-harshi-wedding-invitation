@@ -2,7 +2,9 @@ import { prefersMobileWebKitMotion } from "@/lib/motion";
 import { vivahTrace } from "@/lib/vivahTrace";
 
 export const SHANK_AUDIO_SRC = "/assets/audio/shankh-sound.mp3";
-export const MANTRA_AUDIO_SRC = "/assets/audio/ganesha-mantra.mp3";
+export const MANTRA_AUDIO_SRC = "/assets/audio/navkar-mantra.mp3";
+/** Skip intro junk (~2 stray words) before णमो; keep in sync with mantraTimings offsets. */
+export const MANTRA_PLAYBACK_TRIM_START_SEC = 2;
 export const POP_AUDIO_SRC = "/assets/audio/pop.mp3";
 export const APPLAUSE_AUDIO_SRC = "/assets/audio/applause.mp3";
 
@@ -25,6 +27,10 @@ let mantraGain: GainNode | null = null;
 let mantraPlaybackStartTime = 0;
 let mantraPerformanceStart = 0;
 let mantraPlaybackActive = false;
+let mantraHtmlPrimePromise: Promise<void> | null = null;
+let mantraHtmlFadeTimer: number | null = null;
+
+const MANTRA_FADE_IN_SEC = 0.35;
 
 let popAudio: HTMLAudioElement | null = null;
 let applauseAudio: HTMLAudioElement | null = null;
@@ -42,6 +48,78 @@ export function createBufferedAudio(src: string, loop = false) {
   applyInlineAudioAttrs(audio);
   audio.load();
   return audio;
+}
+
+function mantraHtmlSeekTarget() {
+  return MANTRA_PLAYBACK_TRIM_START_SEC;
+}
+
+/** Wait until HTMLAudio is paused at the mantra trim point (in-sync start). */
+export function seekMantraHtmlToStart(audio: HTMLAudioElement): Promise<void> {
+  const target = mantraHtmlSeekTarget();
+  audio.pause();
+  if (Math.abs(audio.currentTime - target) < 0.02 && !audio.seeking) {
+    return Promise.resolve();
+  }
+  return new Promise((resolve) => {
+    const finish = () => resolve();
+    try {
+      audio.currentTime = target;
+    } catch {
+      finish();
+      return;
+    }
+    if (!audio.seeking) {
+      finish();
+      return;
+    }
+    audio.addEventListener("seeked", finish, { once: true });
+    window.setTimeout(finish, 120);
+  });
+}
+
+/** Elapsed seconds for lyric sync (0 = first णमो line at trim point). */
+export function getMantraHtmlPlaybackElapsed(audio: HTMLAudioElement): number {
+  return Math.max(0, audio.currentTime - MANTRA_PLAYBACK_TRIM_START_SEC);
+}
+
+/**
+ * Unlock mantra HTML during envelope tap without leaving the element mid-track.
+ * Must run synchronously in the gesture handler (before await).
+ */
+function primeMantraHtmlUnlock(audio: HTMLAudioElement) {
+  if (mantraPlaybackActive) return;
+  applyInlineAudioAttrs(audio);
+  audio.pause();
+  try {
+    audio.currentTime = 0;
+  } catch {
+    // ignore — will seek again before real playback
+  }
+  const previousMuted = audio.muted;
+  const previousVolume = audio.volume;
+  audio.muted = true;
+  audio.volume = 0;
+  const playPromise = audio.play();
+  if (!playPromise) {
+    audio.muted = previousMuted;
+    audio.volume = previousVolume;
+    return;
+  }
+  mantraHtmlPrimePromise = playPromise
+    .then(() => {
+      audio.pause();
+      audio.currentTime = 0;
+      audio.muted = previousMuted;
+      audio.volume = previousVolume;
+    })
+    .catch(() => {
+      audio.muted = previousMuted;
+      audio.volume = previousVolume;
+    })
+    .finally(() => {
+      mantraHtmlPrimePromise = null;
+    });
 }
 
 /** iOS Safari requires a play() during the user gesture before later programmatic playback works. */
@@ -190,7 +268,7 @@ export function unlockAudioOnUserGesture() {
     }
   }
 
-  if (mantraAudio && !mantraPlaybackActive) primeHtmlAudio(mantraAudio);
+  if (mantraAudio && !mantraPlaybackActive) primeMantraHtmlUnlock(mantraAudio);
   primeHtmlAudio(ensureShankHtmlFallback());
   if (popAudio) primeHtmlAudio(popAudio);
   if (applauseAudio) primeHtmlAudio(applauseAudio);
@@ -249,17 +327,18 @@ export function getMantraPlaybackElapsed(): number {
 }
 
 export function getMantraAudioDuration(): number {
+  let full = 0;
   if (mantraBuffer && Number.isFinite(mantraBuffer.duration)) {
-    return mantraBuffer.duration;
-  }
-  if (
+    full = mantraBuffer.duration;
+  } else if (
     mantraAudio &&
     Number.isFinite(mantraAudio.duration) &&
     mantraAudio.duration > 0
   ) {
-    return mantraAudio.duration;
+    full = mantraAudio.duration;
   }
-  return 0;
+  if (full <= 0) return 0;
+  return Math.max(0, full - MANTRA_PLAYBACK_TRIM_START_SEC);
 }
 
 /**
@@ -288,7 +367,9 @@ export function playMantraCue(
   const source = shankContext.createBufferSource();
   source.buffer = mantraBuffer;
   const gain = shankContext.createGain();
-  gain.gain.value = vol;
+  const now = shankContext.currentTime;
+  gain.gain.setValueAtTime(0, now);
+  gain.gain.linearRampToValueAtTime(vol, now + MANTRA_FADE_IN_SEC);
   source.connect(gain);
   gain.connect(shankContext.destination);
   mantraSource = source;
@@ -305,7 +386,16 @@ export function playMantraCue(
     if (!shankContext || !mantraSource) return;
     mantraPlaybackStartTime = shankContext.currentTime;
     mantraPerformanceStart = performance.now();
-    mantraSource.start(0);
+    const offset = MANTRA_PLAYBACK_TRIM_START_SEC;
+    const playDuration =
+      mantraBuffer && Number.isFinite(mantraBuffer.duration)
+        ? Math.max(0, mantraBuffer.duration - offset)
+        : undefined;
+    if (playDuration !== undefined && playDuration > 0) {
+      mantraSource.start(0, offset, playDuration);
+    } else {
+      mantraSource.start(0, offset);
+    }
     registerMantraPlaybackStart();
     vivahTrace("audio-playing", { track: "mantra", engine: "webaudio" });
     onStarted?.();
@@ -318,21 +408,7 @@ export function playMantraCue(
       .catch(() => {
         stopMantraWebAudio();
         vivahTrace("audio-play-failed", { track: "mantra", engine: "webaudio" });
-        if (!mantraAudio) return;
-        mantraAudio.pause();
-        mantraAudio.currentTime = 0;
-        mantraAudio.volume = vol;
-        mantraAudio.addEventListener("ended", () => onEnded?.(), { once: true });
-        void mantraAudio
-          .play()
-          .then(() => {
-            registerMantraPlaybackStart();
-            vivahTrace("audio-playing", { track: "mantra", engine: "html-fallback" });
-            onStarted?.();
-          })
-          .catch(() => {
-            vivahTrace("audio-play-failed", { track: "mantra", engine: "html-fallback" });
-          });
+        void playMantraHtml(vol, onEnded, onStarted);
       });
   } else {
     begin();
@@ -341,9 +417,77 @@ export function playMantraCue(
   return true;
 }
 
+/**
+ * HTML mantra from sample 0 with seek confirmation and a short volume fade-in.
+ * Used on WebKit mobile where Web Audio mantra is skipped.
+ */
+export async function playMantraHtml(
+  volume: number,
+  onEnded?: () => void,
+  onStarted?: () => void,
+): Promise<boolean> {
+  warmCriticalAudio();
+  const audio = acquireMantraAudio();
+  if (!audio) return false;
+
+  const vol = Math.max(0, Math.min(1, volume));
+  stopMantraWebAudio();
+  mantraPlaybackActive = false;
+
+  if (mantraHtmlPrimePromise) {
+    try {
+      await mantraHtmlPrimePromise;
+    } catch {
+      // ignore
+    }
+  }
+
+  audio.removeAttribute("loop");
+  audio.loop = false;
+  audio.muted = false;
+  await seekMantraHtmlToStart(audio);
+
+  if (onEnded) {
+    audio.addEventListener("ended", () => onEnded(), { once: true });
+  }
+
+  audio.volume = 0;
+  try {
+    await audio.play();
+  } catch {
+    vivahTrace("audio-play-failed", { track: "mantra", engine: "html" });
+    return false;
+  }
+
+  registerMantraPlaybackStart();
+  vivahTrace("audio-playing", { track: "mantra", engine: "html" });
+
+  const fadeSteps = 12;
+  const stepMs = (MANTRA_FADE_IN_SEC * 1000) / fadeSteps;
+  let step = 0;
+  if (mantraHtmlFadeTimer) window.clearInterval(mantraHtmlFadeTimer);
+  mantraHtmlFadeTimer = window.setInterval(() => {
+    step += 1;
+    const t = step / fadeSteps;
+    audio.volume = vol * Math.min(1, t);
+    if (step >= fadeSteps) {
+      if (mantraHtmlFadeTimer) window.clearInterval(mantraHtmlFadeTimer);
+      mantraHtmlFadeTimer = null;
+      audio.volume = vol;
+    }
+  }, stepMs);
+
+  onStarted?.();
+  return true;
+}
+
 export function stopMantraPlayback() {
   stopMantraWebAudio();
   mantraPlaybackActive = false;
+  if (mantraHtmlFadeTimer) {
+    window.clearInterval(mantraHtmlFadeTimer);
+    mantraHtmlFadeTimer = null;
+  }
   if (!mantraAudio) return;
   mantraAudio.pause();
   mantraAudio.currentTime = 0;

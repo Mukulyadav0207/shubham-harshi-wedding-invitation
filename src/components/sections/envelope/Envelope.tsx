@@ -2,6 +2,7 @@
 
 import Image from "next/image";
 import {
+  useCallback,
   useEffect,
   useRef,
   useState,
@@ -37,8 +38,10 @@ import {
   stopShankPlayback,
 } from "@/audio/criticalAudio";
 import FoldedCard from "./FoldedCard";
-import GaneshaIntro from "../ganesha/GaneshaIntro";
-import InvitationHero from "../invitation/InvitationHero";
+import InvitationHero, {
+  scrollToInviteHeroPresentation,
+  type InvitationAudioZone,
+} from "../invitation/InvitationHero";
 import { configureGsapPlatform, prefersLinearWebKitMotion } from "@/lib/gsapPlatform";
 import { isMobileMotionViewport, MOBILE_MOTION_QUERY } from "@/lib/motion";
 import styles from "./Envelope.module.css";
@@ -149,12 +152,7 @@ function preloadEnvelopeAsset(source: string) {
 
 export default function Envelope() {
   const [state, setState] = useState<
-    | "closed"
-    | "opening"
-    | "transitioning"
-    | "ganesha"
-    | "websiteTransition"
-    | "invitation"
+    "closed" | "opening" | "transitioning" | "invitation"
   >("closed");
   const [isMusicMuted, setIsMusicMuted] = useState(false);
   const [assetsReady, setAssetsReady] = useState(false);
@@ -180,6 +178,12 @@ export default function Envelope() {
   const musicEnabledRef = useRef(true);
   const openingRef = useRef(false);
   const invitationTimerRef = useRef<number | null>(null);
+  const audioZoneRef = useRef<InvitationAudioZone>("spiritual");
+  const bollywoodStartedRef = useRef(false);
+  const invitationActiveRef = useRef(false);
+  const enterMainInvitationRef = useRef<() => void>(() => undefined);
+  const [showSpiritualSkip, setShowSpiritualSkip] = useState(true);
+  const [spiritualSectionRemoved, setSpiritualSectionRemoved] = useState(false);
   const [useMobileDust, setUseMobileDust] = useState(false);
 
   useEffect(() => {
@@ -254,34 +258,79 @@ export default function Envelope() {
     });
   };
 
-  const beginInvitation = () => {
-    if (invitationTimerRef.current) return;
-    vivahTrace("mantra-complete", { action: "begin-invitation" });
-    masterTimeline.setPhase(MasterPhase.InvitationEntrance);
-    weddingMusicRef.current?.fadeOut(500);
+  const enterMainInvitation = useCallback(() => {
+    vivahTrace("animation", { step: "main-invitation-start" });
+    masterTimeline.setPhase(MasterPhase.GaneshaReveal);
     setState("invitation");
-  };
+    setShowSpiritualSkip(true);
+    bollywoodStartedRef.current = false;
+    audioZoneRef.current = "spiritual";
+    resumeAudioContextOnUserGesture();
+    setMantraMuted(!musicEnabledRef.current);
+    requestAnimationFrame(() => {
+      window.scrollTo({ top: 0, behavior: "auto" });
+    });
+  }, []);
 
-  const skipIntro = () => {
-    if (state !== "ganesha" && state !== "websiteTransition") return;
-    if (invitationTimerRef.current)
-      window.clearTimeout(invitationTimerRef.current);
-    invitationTimerRef.current = null;
-    weddingMusicRef.current?.fadeOut(180);
-    setState("invitation");
-  };
+  enterMainInvitationRef.current = enterMainInvitation;
 
   useEffect(() => {
-    if (state !== "invitation") return undefined;
+    invitationActiveRef.current = state === "invitation";
+  }, [state]);
+
+  const startBollywoodMusic = useCallback(() => {
+    if (bollywoodStartedRef.current) return;
+    bollywoodStartedRef.current = true;
     const music = weddingMusicRef.current;
-    if (!music) return undefined;
+    if (!music) return;
+    masterTimeline.setPhase(MasterPhase.InvitationEntrance);
     music.setTrack("invitation");
     music.startInvitationTrackRotation();
     music.setMuted(!musicEnabledRef.current);
     void music.play().then((didPlay) => {
       if (didPlay) music.fadeIn(1200);
     });
-    return () => music.stopInvitationTrackRotation();
+  }, []);
+
+  const handleInvitationAudioZone = useCallback(
+    (zone: InvitationAudioZone) => {
+      if (!invitationActiveRef.current) return;
+      if (audioZoneRef.current === zone) return;
+      audioZoneRef.current = zone;
+
+      if (zone === "spiritual") {
+        weddingMusicRef.current?.fadeOut(450);
+        resumeAudioContextOnUserGesture();
+        setMantraMuted(!musicEnabledRef.current);
+        masterTimeline.setPhase(MasterPhase.MantraIntro);
+        return;
+      }
+
+      setShowSpiritualSkip(false);
+      setMantraPlaybackVolume(0);
+      stopShankPlayback();
+      startBollywoodMusic();
+    },
+    [startBollywoodMusic],
+  );
+
+  const removeSpiritualSection = useCallback(() => {
+    setSpiritualSectionRemoved(true);
+    setShowSpiritualSkip(false);
+  }, []);
+
+  const skipToInviteLogo = () => {
+    if (state !== "invitation") return;
+    handleInvitationAudioZone("invitation");
+    removeSpiritualSection();
+    requestAnimationFrame(() => {
+      scrollToInviteHeroPresentation("smooth");
+    });
+  };
+
+  useEffect(() => {
+    if (state !== "invitation") return undefined;
+    return () => weddingMusicRef.current?.stopInvitationTrackRotation();
   }, [state]);
 
   useEffect(
@@ -339,8 +388,7 @@ export default function Envelope() {
         {
           onTransitioning: () => setState("transitioning"),
           onGanesha: () => {
-            vivahTrace("animation", { step: "ganesha-stage-start" });
-            setState("ganesha");
+            enterMainInvitationRef.current();
           },
         },
       );
@@ -358,9 +406,7 @@ export default function Envelope() {
         {
           reducedMotion,
           onComplete: () => {
-            vivahTrace("animation", { step: "ganesha-stage-start" });
-            masterTimeline.setPhase(MasterPhase.GaneshaReveal);
-            setState("ganesha");
+            enterMainInvitationRef.current();
           },
         },
       );
@@ -461,16 +507,17 @@ export default function Envelope() {
     musicEnabledRef.current = !nextMuted;
     setIsMusicMuted(nextMuted);
 
-    if (state === "ganesha" || state === "websiteTransition") {
-      resumeAudioContextOnUserGesture();
-      setMantraMuted(nextMuted);
-      if (nextMuted) stopShankPlayback();
-      return;
-    }
-
     unlockAudioOnUserGesture();
 
     if (state === "invitation") {
+      if (audioZoneRef.current === "spiritual") {
+        resumeAudioContextOnUserGesture();
+        setMantraMuted(nextMuted);
+        if (nextMuted) stopShankPlayback();
+        weddingMusicRef.current?.setMuted(true);
+        weddingMusicRef.current?.pause();
+        return;
+      }
       setMantraPlaybackVolume(0);
       weddingMusicRef.current?.setMuted(nextMuted);
       if (!nextMuted) {
@@ -492,7 +539,23 @@ export default function Envelope() {
   if (state === "invitation")
     return (
       <>
-        <InvitationHero muted={isMusicMuted} />
+        <InvitationHero
+          muted={isMusicMuted}
+          showSpiritual={!spiritualSectionRemoved}
+          onMantraStart={() => weddingMusicRef.current?.fadeOut(1100)}
+          onAudioZoneChange={handleInvitationAudioZone}
+          onSpiritualFinished={removeSpiritualSection}
+        />
+
+        {showSpiritualSkip && (
+          <button
+            className={styles.skipControl}
+            type="button"
+            onClick={skipToInviteLogo}
+          >
+            Skip <span aria-hidden="true">→</span>
+          </button>
+        )}
 
         <button
           className={styles.musicControl}
@@ -628,25 +691,6 @@ export default function Envelope() {
             </p>
           )}
         </div>
-      )}
-      {state === "websiteTransition" && <InvitationHero cinematic />}
-      {(state === "ganesha" || state === "websiteTransition") && (
-        <GaneshaIntro
-          active={state === "ganesha" || state === "websiteTransition"}
-          dissolving={state === "websiteTransition"}
-          muted={isMusicMuted}
-          onComplete={beginInvitation}
-          onMantraStart={() => weddingMusicRef.current?.fadeOut(1100)}
-        />
-      )}
-      {(state === "ganesha" || state === "websiteTransition") && (
-        <button
-          className={styles.skipControl}
-          type="button"
-          onClick={skipIntro}
-        >
-          Skip <span aria-hidden="true">→</span>
-        </button>
       )}
       {state !== "closed" && (
         <button

@@ -2,16 +2,13 @@ import fs from 'node:fs';
 import decode from 'audio-decode';
 
 const WORDS = [
-  'वक्रतुण्ड',
-  'महाकाय',
-  'सूर्यकोटि',
-  'समप्रभः',
-  'निर्विघ्नं',
-  'कुरु',
-  'मे',
-  'देव',
-  'शुभकार्येषु',
-  'सर्वदा॥',
+  'णमो अरिहंताणं',
+  'णमो सिद्धाणं',
+  'णमो आयरियाणं',
+  'णमो उवज्झायाणं',
+  'णमो लोए सव्व साहूणं',
+  'एसो पंच णमोकारो, सव्व पाव प्पणासणो ।',
+  'मंगलाणं च सव्वेसिं, पढमं हवइ मंगलम ॥',
 ];
 
 function splitGraphemes(text) {
@@ -43,7 +40,7 @@ function smooth(arr, w) {
   return out;
 }
 
-const buf = fs.readFileSync('public/assets/audio/ganesha-mantra.mp3');
+const buf = fs.readFileSync('public/assets/audio/navkar-mantra.mp3');
 const audio = await decode(buf);
 const data = audio.channelData[0];
 const sr = audio.sampleRate;
@@ -74,8 +71,8 @@ for (let i = heavyE.length - 1; i >= 0; i--) {
   }
 }
 
-// Pick ~10 coarse phrase onsets (min gap derived from speech length).
-const minGap = (speechEnd - speechStart) / 10.2;
+// Pick coarse phrase onsets (min gap derived from speech length).
+const minGap = (speechEnd - speechStart) / (WORDS.length + 0.2);
 const coarseOnsets = [];
 for (let i = 2; i < smoothE.length; i++) {
   const rise = smoothE[i] - smoothE[i - 3];
@@ -107,12 +104,12 @@ function graphemeWeightedTimings(start, end) {
 }
 
 function onsetAnchoredTimings() {
-  let starts = coarseOnsets.slice(0, 10);
-  if (starts.length < 10) {
+  let starts = coarseOnsets.slice(0, WORDS.length);
+  if (starts.length < WORDS.length) {
     const weighted = graphemeWeightedTimings(speechStart, speechEnd);
     starts = weighted.map((timing) => timing.start);
-  } else if (starts.length > 10) {
-    starts = starts.slice(0, 10);
+  } else if (starts.length > WORDS.length) {
+    starts = starts.slice(0, WORDS.length);
   }
 
   if (starts[0] > speechStart + 0.2) {

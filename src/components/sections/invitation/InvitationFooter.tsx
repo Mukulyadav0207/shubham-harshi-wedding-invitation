@@ -15,8 +15,8 @@ export default function InvitationFooter() {
       <div className={styles.inner}>
         <div className={styles.brand}>
           <p className={styles.hashtag}>{WEDDING_HASHTAG}</p>
-          <p className={styles.names}>Mandeep &amp; Ritika</p>
-          <p className={styles.date}>26 November 2026</p>
+          <p className={styles.names}>Shubham &amp; Harshi</p>
+          <p className={styles.date}>21 November 2026</p>
         </div>
 
         <div className={styles.signOff}>

@@ -41,7 +41,7 @@ export default function VenueSection({
     >
       <header className={styles.header}>
         <p>Where We Celebrate</p>
-        <h2 id="venue-section-title">Three Places, One Celebration</h2>
+        <h2 id="venue-section-title">One Venue, A Lifetime of Togetherness</h2>
         <span aria-hidden="true">✦</span>
       </header>
       <div className={styles.journey}>
@@ -64,9 +64,6 @@ export default function VenueSection({
               />
               <div className={styles.venueDetailsPanel}>
                 <header className={styles.venueTitle}>
-                  <span className={styles.venueIndex}>
-                    {String(index + 1).padStart(2, "0")}
-                  </span>
                   <span className={styles.venueLabel}>{venue.label}</span>
                 </header>
                 <div className={styles.venueDivider} aria-hidden="true">
@@ -102,12 +99,22 @@ export default function VenueSection({
                 <a
                   className={styles.directions}
                   href={venue.directionsUrl}
-                  rel="noopener"
+                  target="_blank"
+                  rel="noopener noreferrer"
                   aria-label={`Get directions to ${venue.name}`}
                 >
                   Get Directions <ExternalLink aria-hidden="true" />
                 </a>
               </div>
+            </div>
+            <div className={styles.mapEmbed}>
+              <iframe
+                title={`Map showing ${venue.name}`}
+                src={venue.mapEmbedUrl}
+                loading="lazy"
+                referrerPolicy="strict-origin-when-cross-origin"
+                allowFullScreen
+              />
             </div>
           </article>
         ))}

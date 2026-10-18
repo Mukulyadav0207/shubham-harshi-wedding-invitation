@@ -1,5 +1,3 @@
-import { googleMapsDirectionsUrl } from '@/lib/maps';
-
 export type Venue = {
   id: number;
   type: string;
@@ -11,47 +9,24 @@ export type Venue = {
   image: string;
   mapQuery: string;
   directionsUrl: string;
+  mapEmbedUrl: string;
 };
 
 export const venues: readonly Venue[] = [
   {
     id: 1,
-    type: 'lagan-sagai',
-    label: 'Lagan-Sagai',
-    date: '24 Nov, 2026',
-    time: '3:00 PM onwards',
-    name: 'Basti Ram Palace',
-    address: '16G, Kankrola, IMT Manesar, Gurugram, Haryana',
-    image: '/assets/images/venues/lagan-venue.webp',
-    mapQuery: 'Basti Ram Palace, 16G, Kankrola, IMT Manesar, Gurugram, Haryana',
-    directionsUrl: googleMapsDirectionsUrl(
-      'Basti Ram Palace, 16G, Kankrola, IMT Manesar, Gurugram, Haryana',
-    ),
-  },
-  {
-    id: 2,
-    type: 'haldi-mehndi-sangeet',
-    label: 'Haldi, Mehndi & Sangeet',
-    date: '25 Nov, 2026',
-    time: '12:00 PM onwards',
-    name: 'The Divine Wedding Farm',
-    address: 'Sector 91, Gurugram, Haryana 122505',
-    image: '/assets/images/venues/haldi-mehndi-sangeet-venue.webp',
-    mapQuery: 'The Divine Wedding Farm, Sector 91, Gurugram, Haryana 122505',
-    directionsUrl: 'https://maps.app.goo.gl/EHE1SmTQJ94wyvCc8?g_st=aw',
-  },
-  {
-    id: 3,
-    type: 'barat',
-    label: 'Wedding',
-    date: '26 Nov, 2026',
-    time: '7:00 PM Onwards',
-    name: 'Raj Resort',
-    address: 'NH58, Meerut-Baghpat Bypaas, Meerut, Uttar Pradesh',
-    image: '/assets/images/venues/barat-venue.webp',
-    mapQuery: 'Raj Resort, NH58, Meerut-Baghpat Bypaas, Meerut, Uttar Pradesh',
-    directionsUrl: googleMapsDirectionsUrl(
-      'Raj Resort, NH58, Meerut-Baghpat Bypaas, Meerut, Uttar Pradesh',
-    ),
+    type: 'celebration-venue',
+    label: 'Celebration Venue',
+    date: '20 – 21 November 2026',
+    time: 'Haldi through Reception',
+    name: 'The Crown Palace',
+    address: 'Makronia Rd, Sagar, MP 470004',
+    image: '/assets/images/venues/crown-palace.webp',
+    mapQuery:
+      'VQ2J 5PW The Crown Palace Hotel, Makronia Rd, near Hawk Canteen, Sagar, Makroniya, Madhya Pradesh 470004',
+    directionsUrl:
+      'https://maps.app.goo.gl/6UkZUiMr8UvLNqtM6?g_st=iw',
+    mapEmbedUrl:
+      'https://www.google.com/maps/embed?pb=!1m18!1m12!1m3!1d3649.1023742981524!2d78.78182129999999!3d23.8504982!2m3!1f0!2f0!3f0!3m2!1i1024!2i768!4f13.1!3m3!1m2!1s0x3978d141add80193%3A0x75c6064b8500624e!2sThe%20Crown%20Palace%20Hotel!5e0!3m2!1sen!2sin!4v1792249185221!5m2!1sen!2sin',
   },
 ] as const;

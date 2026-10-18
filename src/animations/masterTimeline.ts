@@ -109,7 +109,7 @@ class MasterTimelineController {
 
   /** Whether ambient/decorative canvas loops may run. */
   getDecorativeParticleMode(): DecorativeParticleMode {
-    if (this.phase < MasterPhase.InvitationEntrance) return "paused";
+    if (this.phase < MasterPhase.GaneshaReveal) return "paused";
     if (this.scrollActive || this.phase === MasterPhase.Scrolling) {
       return "reduced";
     }

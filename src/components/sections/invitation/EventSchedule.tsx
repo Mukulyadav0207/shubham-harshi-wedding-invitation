@@ -21,57 +21,63 @@ export type WeddingEvent = {
 
 export const events: readonly WeddingEvent[] = [
   {
-    title: 'Lagan Sagai',
-    date: '24 November 2026',
-    times: ['Tilak — 3:00 PM', 'Dinner — 6:00 PM'],
-    venue: 'Bastiram Palace',
-    location: 'Sector 87, Kankrola, Gurugram',
-    image: '/assets/images/events/lagan.webp',
+    title: 'Bus Departure',
+    date: '19 November 2026',
+    times: ['3:00 PM'],
+    venue: '',
+    location: 'Sarai, Baghpat (UP)',
+    image: '/assets/images/events/sarai-bus.webp',
   },
   {
     title: 'Haldi',
-    date: '25 November 2026',
-    times: ['12:00 PM onwards'],
-    venue: 'The Divine Wedding Farm',
-    location: 'Sector 91, Gurugram, Haryana 122505',
-    dressCode: 'Dress code: Fuchsia pink',
+    date: '20 November 2026',
+    times: ['11:00 PM onwards'],
+    venue: 'The Crown Palace',
+    location: 'Makronia Rd, Sagar, MP 470004',
+    // dressCode: 'Dress code: Fuchsia pink',
     image: '/assets/images/events/haldi1.webp',
     alternateImage: '/assets/images/events/haldi2.webp',
     alternateSwapDelayMs: 3500,
   },
   {
-    title: 'Mehndi',
-    date: '25 November 2026',
+    title: 'Sagai & Sangeet Night',
+    date: '20 November 2026',
     times: ['6:00 PM onwards'],
-    venue: 'The Divine Wedding Farm',
-    location: 'Sector 91, Gurugram, Haryana 122505',
-    image: '/assets/images/events/mehndi.webp',
+    venue: 'The Crown Palace',
+    location: 'Makronia Rd, Sagar, MP 470004',
+     image: '/assets/images/events/sangeet.webp',
   },
   {
-    title: 'Sangeet',
-    date: '25 November 2026',
-    times: ['7:00 PM onwards'],
-    venue: 'The Divine Wedding Farm',
-    location: 'Sector 91, Gurugram, Haryana 122505',
-    image: '/assets/images/events/sangeet.webp',
+    title: 'Ghurchadi Tika',
+    date: '21 November 2026',
+    times: ['9:00 PM'],
+    venue: 'The Crown Palace',
+    location: 'Makronia Rd, Sagar, MP 470004',
+    image: '/assets/images/events/tika.webp',
   },
   {
-    title: 'Ghurchadi',
-    date: '26 November 2026',
-    times: ['2:00 PM'],
-    venue: 'DLF Garden City',
-    location: 'Sector-92, Gurugram',
-    image: '/assets/images/events/ghurchadi.webp',
+    title: 'Pheras',
+    date: '21 November 2026',
+    times: ['11:00 AM'],
+    venue: 'The Crown Palace',
+    location: 'Makronia Rd, Sagar, MP 470004',
+    image: '/assets/images/events/pheras.webp',
   },
   {
-    title: 'Barat Chadhat',
-    date: '26 November 2026',
-    times: ['7:00 PM'],
-    venue: 'Raj Resort',
-    location: 'NH58 Meerut',
-    image: '/assets/images/events/barat.webp',
-    nightImage: '/assets/images/events/barat-night.webp',
-    alternateSwapDelayMs: 3500,
+    title: 'Reception',
+    date: '21 November 2026',
+    times: ['5:00 pM'],
+    venue: 'The Crown Palace',
+    location: 'Makronia Rd, Sagar, MP 470004',
+    image: '/assets/images/events/reception.webp',
+  },
+  {
+    title: 'Bus Departure',
+    date: '21 November 2026',
+    times: ['11:00 PM'],
+    venue: '',
+    location: 'Sagar, MP 470004',
+    image: '/assets/images/events/sagar-bus.webp',
   },
 ] as const;
 
@@ -95,7 +101,13 @@ export default function EventSchedule({ events: schedule = events }: EventSchedu
         <h2 id="events-schedule-title">Events Schedule</h2>
       </header>
       <ol className={styles.timeline}>
-        {schedule.map((event, index) => <EventCard key={event.title} event={event} index={index} />)}
+        {schedule.map((event, index) => (
+          <EventCard
+            key={`${event.title}-${event.date}-${event.times[0]}`}
+            event={event}
+            index={index}
+          />
+        ))}
       </ol>
     </section>
   );

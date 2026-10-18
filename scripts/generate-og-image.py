@@ -107,11 +107,11 @@ def patch_names_on_original(image: Image.Image) -> Image.Image:
     name_font = load_font(58, bold=True)
     amp_font = load_font(30, italic=True)
     y = 158
-    y = draw_centered(draw, "Mandeep", y, name_font, BLUE, text_width, text_left)
+    y = draw_centered(draw, "Shubham", y, name_font, BLUE, text_width, text_left)
     y += 12
     y = draw_centered(draw, "&", y, amp_font, GOLD, text_width, text_left)
     y += 6
-    draw_centered(draw, "Ritika", y, name_font, BLUE, text_width, text_left)
+    draw_centered(draw, "Harshi", y, name_font, BLUE, text_width, text_left)
 
     return Image.alpha_composite(canvas, overlay)
 
@@ -153,15 +153,15 @@ def build_from_photo() -> Image.Image:
 
     y = draw_centered(draw, "THE WEDDING OF", y, label_font, GOLD, text_width, text_left)
     y += 18
-    y = draw_centered(draw, "Mandeep", y, name_font, BLUE, text_width, text_left)
+    y = draw_centered(draw, "Shubham", y, name_font, BLUE, text_width, text_left)
     y += 8
     y = draw_centered(draw, "&", y, amp_font, GOLD, text_width, text_left)
     y += 6
-    y = draw_centered(draw, "Ritika", y, name_font, BLUE, text_width, text_left)
+    y = draw_centered(draw, "Harshi", y, name_font, BLUE, text_width, text_left)
     y += 24
     y = draw_centered(draw, "WEDDING INVITATION", y, invite_font, WINE, text_width, text_left)
     y += 16
-    y = draw_centered(draw, "26 NOVEMBER 2026", y, date_font, GOLD, text_width, text_left)
+    y = draw_centered(draw, "21 NOVEMBER 2026", y, date_font, GOLD, text_width, text_left)
     y += 18
     draw_centered(
         draw,

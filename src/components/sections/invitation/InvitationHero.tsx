@@ -12,7 +12,7 @@ import { venues } from "./venueData";
 import {
   ClosingSection,
   FamilyLoveSection,
-  StoryMomentsSection,
+  // StoryMomentsSection,
 } from "./InvitationClosingSections";
 import { isMobileMotionViewport, MOBILE_MOTION_QUERY } from "@/lib/motion";
 import { unlockAudioOnUserGesture, acquireApplauseAudio, acquirePopAudio } from "@/audio/criticalAudio";
@@ -21,9 +21,32 @@ import { initScrollActivity } from "@/lib/scrollActivity";
 import { getPageScrollBounceProgress } from "@/lib/ballBounce";
 import { useBallBounce } from "@/hooks/useBallBounce";
 import { WEDDING_HASHTAG } from "./weddingContent";
+import GaneshaIntro from "../ganesha/GaneshaIntro";
 import styles from "./InvitationHero.module.css";
 
-const WEDDING_DATE = new Date(2026, 10, 26, 0, 0, 0);
+export const INVITE_LOGO_ELEMENT_ID = "invite-logo";
+export const INVITE_HERO_SECTION_ID = "home";
+export const INVITATION_CARD_ELEMENT_ID = "invitation-card";
+
+/** Align invite hero (logo + hashtag) with natural top padding — not flush to viewport. */
+export function scrollToInviteHeroPresentation(
+  behavior: ScrollBehavior = "smooth",
+) {
+  const hero = document.getElementById(INVITE_HERO_SECTION_ID);
+  if (hero) {
+    hero.scrollIntoView({ behavior, block: "start" });
+    return;
+  }
+  document.getElementById(INVITE_LOGO_ELEMENT_ID)?.scrollIntoView({
+    behavior,
+    block: "start",
+  });
+}
+
+export type InvitationAudioZone = "spiritual" | "invitation";
+
+const WEDDING_DATE = new Date(2026, 10, 21, 0, 0, 0);
+const WEDDING_DATE_DISPLAY = "21 Nov, 2026";
 const WEDDING_DAY_NAME = new Intl.DateTimeFormat("en-US", {
   weekday: "long",
 }).format(WEDDING_DATE);
@@ -376,20 +399,29 @@ function subscribeMobileMotion(onStoreChange: () => void) {
 export default function InvitationHero({
   cinematic = false,
   muted = false,
+  showSpiritual = true,
+  onMantraStart,
+  onAudioZoneChange,
+  onSpiritualFinished,
 }: {
   cinematic?: boolean;
   muted?: boolean;
+  showSpiritual?: boolean;
+  onMantraStart?: () => void;
+  onAudioZoneChange?: (zone: InvitationAudioZone) => void;
+  onSpiritualFinished?: () => void;
 }) {
   const [revealed, setRevealed] = useState(false);
   const [completing, setCompleting] = useState(false);
   const [scratching, setScratching] = useState(false);
   const [scrollHintPhase, setScrollHintPhase] = useState<ScrollHintPhase>(
-    cinematic ? "hidden" : "hero",
+    "hidden",
   );
   const invitationRef = useRef<HTMLElement>(null);
   const visualRef = useRef<HTMLDivElement>(null);
   const countdownRef = useRef<HTMLElement>(null);
   const canvasRef = useRef<HTMLCanvasElement>(null);
+  const spiritualRef = useRef<HTMLDivElement>(null);
   const logoButtonRef = useRef<HTMLButtonElement>(null);
   const logoMotionRef = useRef<HTMLSpanElement>(null);
   const drawing = useRef(false);
@@ -420,8 +452,52 @@ export default function InvitationHero({
   useEffect(() => {
     if (cinematic) return;
     initScrollActivity();
-    masterTimeline.setPhase(MasterPhase.InvitationEntrance);
   }, [cinematic]);
+
+  useEffect(() => {
+    if (cinematic || !onAudioZoneChange) return undefined;
+    if (!showSpiritual) {
+      onAudioZoneChange("invitation");
+      return undefined;
+    }
+    const spiritual = spiritualRef.current;
+    const logo = logoButtonRef.current;
+    if (!spiritual || !logo) return undefined;
+
+    let spiritualRatio = 0;
+    let logoRatio = 0;
+
+    const publishZone = () => {
+      if (logoRatio >= 0.22) {
+        onAudioZoneChange("invitation");
+        return;
+      }
+      if (spiritualRatio >= 0.08) {
+        onAudioZoneChange("spiritual");
+        return;
+      }
+      const spiritualBottom = spiritual.getBoundingClientRect().bottom;
+      if (spiritualBottom < window.innerHeight * 0.12) {
+        onAudioZoneChange("invitation");
+      }
+    };
+
+    const observer = new IntersectionObserver(
+      (entries) => {
+        for (const entry of entries) {
+          if (entry.target === spiritual) spiritualRatio = entry.intersectionRatio;
+          if (entry.target === logo) logoRatio = entry.intersectionRatio;
+        }
+        publishZone();
+      },
+      { threshold: [0, 0.08, 0.2, 0.35, 0.55, 0.75, 1] },
+    );
+
+    observer.observe(spiritual);
+    observer.observe(logo);
+    publishZone();
+    return () => observer.disconnect();
+  }, [cinematic, onAudioZoneChange, showSpiritual]);
 
   useEffect(() => {
     if (cinematic || !revealed) return;
@@ -746,7 +822,7 @@ export default function InvitationHero({
   return (
     <main
       ref={invitationRef}
-      className={`${styles.invitation} ${cinematic ? styles.cinematic : ""} ${revealed && !cinematic ? styles.withNav : ""}`}
+      className={`${styles.invitation} ${cinematic ? styles.cinematic : ""} ${!cinematic && revealed ? styles.withNav : ""}`}
       aria-hidden={cinematic || undefined}
     >
       {!cinematic && revealed && <InvitationNav />}
@@ -754,9 +830,30 @@ export default function InvitationHero({
       {!cinematic && (
         <>
           <FlowingParticles variant="viewport" className={styles.ambientCanvas} />
-          {!mobileMotion && revealed && <WingedVesselParticle />}
-          {!mobileMotion && revealed && <ButterflyParticle />}
+          {!mobileMotion && <WingedVesselParticle />}
+          {!mobileMotion && <ButterflyParticle />}
         </>
+      )}
+      {!cinematic && showSpiritual && (
+        <div ref={spiritualRef} className={styles.spiritualAnchor}>
+          <GaneshaIntro
+            layout="embedded"
+            active
+            muted={muted}
+            onMantraStart={onMantraStart}
+            onComplete={() => {
+              onAudioZoneChange?.("invitation");
+              scrollToInviteHeroPresentation("smooth");
+              window.setTimeout(() => {
+                onSpiritualFinished?.();
+                requestAnimationFrame(() => {
+                  scrollToInviteHeroPresentation("auto");
+                  setScrollHintPhase("hero");
+                });
+              }, 880);
+            }}
+          />
+        </div>
       )}
       {!cinematic && (
         <CelebrationConfetti
@@ -770,11 +867,12 @@ export default function InvitationHero({
       <section
         id="home"
         className={`${styles.hero} ${!cinematic ? styles.heroWithAnnouncement : ""}`}
-        aria-label="Mandeep and Ritika's wedding invitation"
+        aria-label="Shubham and Harshi's wedding invitation"
       >
         {!cinematic && (
           <div className={styles.weddingAnnouncement}>
             <button
+              id={INVITE_LOGO_ELEMENT_ID}
               ref={logoButtonRef}
               className={`${styles.logoButton} ${logoScrollSettled && !logoAnimating ? styles.logoSettled : ""}`}
               type="button"
@@ -785,8 +883,8 @@ export default function InvitationHero({
                 <Image
                   className={styles.logo}
                   src="/assets/images/bg/invite-logo.webp"
-                  width={1254}
-                  height={1254}
+                  width={1536}
+                  height={1024}
                   alt=""
                   priority
                   sizes="(max-width: 760px) 96px, 144px"
@@ -794,11 +892,11 @@ export default function InvitationHero({
               </span>
             </button>
             {/* <h1 className={styles.announcementNames}>
-              <span>Mandeep</span>
+              <span>Shubham</span>
               <span className={styles.announcementAmp} aria-hidden="true">
                 &amp;
               </span>
-              <span>Ritika</span>
+              <span>Harshi</span>
             </h1> */}
             {/* <div className={styles.announcementDivider} aria-hidden="true"><span />✦<span /></div> */}
             <div className={styles.announcementText}>
@@ -817,9 +915,9 @@ export default function InvitationHero({
             We cordially invite you to witness the beginning of our forever and
             celebrate the wedding ceremony of
           </p>
-          <h1 className={styles.name}>Mandeep</h1>
+          <h1 className={styles.name}>Shubham</h1>
           <p className={styles.with}>weds</p>
-          <p className={styles.name}>Ritika</p>
+          <p className={styles.name}>Harshi</p>
         </div>
         <div ref={visualRef} className={styles.visual}>
           <figure className={styles.portrait}>
@@ -828,7 +926,7 @@ export default function InvitationHero({
               src="/assets/images/bg/mr-photo.webp"
               width={1023}
               height={1537}
-              alt="Mandeep and Ritika"
+              alt="Shubham and Harshi"
               priority
               sizes="(max-width: 760px) min(340px, 100vw), 420px"
             />
@@ -864,7 +962,7 @@ export default function InvitationHero({
       )}
       {revealed && <EventSchedule />}
       {revealed && <VenueSection venues={venues} />}
-      {revealed && <StoryMomentsSection />}
+      {/* {revealed && <StoryMomentsSection />} */}
       {revealed && <FamilyLoveSection />}
       {revealed && <ClosingSection />}
       {revealed && <InvitationFooter />}
@@ -888,7 +986,10 @@ function ScratchCard({
   onPointerUp: (event: React.PointerEvent<HTMLCanvasElement>) => void;
 }) {
   return (
-    <div className={`${styles.scratchCard} ${revealed ? styles.revealed : ""}`}>
+    <div
+      id={INVITATION_CARD_ELEMENT_ID}
+      className={`${styles.scratchCard} ${revealed ? styles.revealed : ""}`}
+    >
       <div className={styles.revealBackdrop} aria-hidden="true" />
       <Image
         className={styles.windowArtwork}
@@ -908,7 +1009,7 @@ function ScratchCard({
             ♡
             <i />
           </span>
-          <strong className={styles.revealDate}>26 Nov, 2026</strong>
+          <strong className={styles.revealDate}>{WEDDING_DATE_DISPLAY}</strong>
           <em className={styles.revealDay}>{WEDDING_DAY_NAME}</em>
         </div>
       </div>

@@ -1,1 +1,1 @@
-export const WEDDING_HASHTAG = "#ManKiReet";
+export const WEDDING_HASHTAG = "#shushi";

@@ -6,5 +6,5 @@ export const closingContent = {
     "Thank you for being part of our beautiful beginning. Your love, presence, and blessings mean more to us than words can express as we begin this new chapter together.",
   ],
   signOff: "With Love & Gratitude",
-  family: "Yadav Family",
+  family: "Jain Family",
 } as const;
