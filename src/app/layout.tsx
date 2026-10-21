@@ -26,6 +26,7 @@ export const metadata: Metadata = {
   },
   icons: {
     icon: "/favicon.png",
+    apple: "/apple-touch-icon.png",
   },
   openGraph: {
     type: "website",
@@ -37,8 +38,8 @@ export const metadata: Metadata = {
     images: [
       {
         url: "/og-image.webp",
-        width: 1200,
-        height: 630,
+        width: 1870,
+        height: 841,
         alt: "Shubham and Harshi's wedding invitation for 21 November 2026",
         type: "image/webp",
       },

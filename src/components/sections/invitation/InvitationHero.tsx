@@ -958,8 +958,8 @@ export default function InvitationHero({
                 <Image
                   className={styles.logo}
                   src="/assets/images/bg/invite-logo.webp"
-                  width={1536}
-                  height={1024}
+                  width={1304}
+                  height={1206}
                   alt=""
                   priority
                   sizes="(max-width: 760px) 96px, 144px"
@@ -998,9 +998,9 @@ export default function InvitationHero({
           <figure className={styles.portrait}>
             <Image
               className={styles.couplePhoto}
-              src="/assets/images/bg/mr-photo.webp"
-              width={1023}
-              height={1537}
+              src="/assets/images/bg/sh-photo.webp"
+              width={1086}
+              height={1448}
               alt="Shubham and Harshi"
               priority
               sizes="(max-width: 760px) min(340px, 100vw), 420px"

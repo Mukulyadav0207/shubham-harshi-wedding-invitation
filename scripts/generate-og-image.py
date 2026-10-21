@@ -9,7 +9,7 @@ from PIL import Image, ImageDraw, ImageFont, ImageFilter, ImageEnhance
 
 ROOT = Path(__file__).resolve().parents[1]
 OUT = ROOT / "public" / "og-image.webp"
-PHOTO = ROOT / "public" / "assets" / "images" / "bg" / "mr-photo.webp"
+PHOTO = ROOT / "public" / "assets" / "images" / "bg" / "sh-photo.webp"
 
 WIDTH, HEIGHT = 1200, 630
 GOLD = (196, 168, 118)

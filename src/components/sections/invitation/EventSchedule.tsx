@@ -31,9 +31,9 @@ export const events: readonly WeddingEvent[] = [
   {
     title: 'Haldi',
     date: '20 November 2026',
-    times: ['11:00 PM onwards'],
+    times: ['11:00 AM onwards'],
     venue: 'The Crown Palace',
-    location: 'Makronia Rd, Sagar, MP 470004',
+    location: 'Makronia Rd, Sagar, MP 470002',
     // dressCode: 'Dress code: Fuchsia pink',
     image: '/assets/images/events/haldi1.webp',
     alternateImage: '/assets/images/events/haldi2.webp',
@@ -44,15 +44,15 @@ export const events: readonly WeddingEvent[] = [
     date: '20 November 2026',
     times: ['6:00 PM onwards'],
     venue: 'The Crown Palace',
-    location: 'Makronia Rd, Sagar, MP 470004',
+    location: 'Makronia Rd, Sagar, MP 470002',
      image: '/assets/images/events/sangeet.webp',
   },
   {
     title: 'Ghurchadi Tika',
     date: '21 November 2026',
-    times: ['9:00 PM'],
+    times: ['9:00 AM'],
     venue: 'The Crown Palace',
-    location: 'Makronia Rd, Sagar, MP 470004',
+    location: 'Makronia Rd, Sagar, MP 470002',
     image: '/assets/images/events/tika.webp',
   },
   {
@@ -60,7 +60,7 @@ export const events: readonly WeddingEvent[] = [
     date: '21 November 2026',
     times: ['11:00 AM'],
     venue: 'The Crown Palace',
-    location: 'Makronia Rd, Sagar, MP 470004',
+    location: 'Makronia Rd, Sagar, MP 470002',
     image: '/assets/images/events/pheras.webp',
   },
   {
@@ -68,7 +68,7 @@ export const events: readonly WeddingEvent[] = [
     date: '21 November 2026',
     times: ['5:00 pM'],
     venue: 'The Crown Palace',
-    location: 'Makronia Rd, Sagar, MP 470004',
+    location: 'Makronia Rd, Sagar, MP 470002',
     image: '/assets/images/events/reception.webp',
   },
   {
@@ -76,7 +76,7 @@ export const events: readonly WeddingEvent[] = [
     date: '21 November 2026',
     times: ['11:00 PM'],
     venue: '',
-    location: 'Sagar, MP 470004',
+    location: 'Sagar, MP 470002',
     image: '/assets/images/events/sagar-bus.webp',
   },
 ] as const;

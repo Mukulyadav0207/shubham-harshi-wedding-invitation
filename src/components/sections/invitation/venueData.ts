@@ -20,10 +20,10 @@ export const venues: readonly Venue[] = [
     date: '20 – 21 November 2026',
     time: 'Haldi through Reception',
     name: 'The Crown Palace',
-    address: 'Makronia Rd, Sagar, MP 470004',
+    address: 'Makronia Rd, Sagar, MP 470002',
     image: '/assets/images/venues/crown-palace.webp',
     mapQuery:
-      'VQ2J 5PW The Crown Palace Hotel, Makronia Rd, near Hawk Canteen, Sagar, Makroniya, Madhya Pradesh 470004',
+      'VQ2J 5PW The Crown Palace Hotel, Makronia Rd, near Hawk Canteen, Sagar, Makroniya, Madhya Pradesh 470002',
     directionsUrl:
       'https://maps.app.goo.gl/6UkZUiMr8UvLNqtM6?g_st=iw',
     mapEmbedUrl:
