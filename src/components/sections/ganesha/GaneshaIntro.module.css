@@ -55,9 +55,7 @@
   width: min(98%, 38rem);
   margin: 0 auto clamp(24px, 6vh, 56px);
   padding:
-    clamp(28px, 6vh, 44px)
-    clamp(14px, 4vw, 26px)
-    clamp(20px, 5vh, 36px);
+    clamp(28px, 6vh, 44px) clamp(14px, 4vw, 26px) clamp(20px, 5vh, 36px);
 }
 
 .ganeshaIntro.embedded .spiritualPanel::before {
@@ -69,32 +67,24 @@
   pointer-events: none;
   opacity: 0;
   background:
-    radial-gradient(
-      ellipse 92% 90% at 50% 42%,
+    radial-gradient(ellipse 92% 90% at 50% 42%,
       rgba(210, 226, 248, 0.4) 0%,
       rgba(192, 212, 238, 0.22) 48%,
-      rgba(192, 212, 238, 0) 82%
-    ),
-    linear-gradient(
-      180deg,
+      rgba(192, 212, 238, 0) 82%),
+    linear-gradient(180deg,
       rgba(255, 255, 255, 0.14) 0%,
-      transparent 55%
-    );
+      transparent 55%);
   -webkit-backdrop-filter: blur(11px) saturate(1.03);
   backdrop-filter: blur(11px) saturate(1.03);
   box-shadow:
     inset 0 1px 0 rgba(255, 255, 255, 0.42),
     0 10px 36px rgba(72, 102, 142, 0.07);
-  -webkit-mask-image: radial-gradient(
-    ellipse 98% 96% at 50% 46%,
-    #000 54%,
-    transparent 100%
-  );
-  mask-image: radial-gradient(
-    ellipse 98% 96% at 50% 46%,
-    #000 54%,
-    transparent 100%
-  );
+  -webkit-mask-image: radial-gradient(ellipse 98% 96% at 50% 46%,
+      #000 54%,
+      transparent 100%);
+  mask-image: radial-gradient(ellipse 98% 96% at 50% 46%,
+      #000 54%,
+      transparent 100%);
   transition: opacity 0.55s ease;
 }
 
@@ -122,14 +112,12 @@
   pointer-events: none;
   opacity: 0;
   background:
-    radial-gradient(
-      ellipse 38% 34% at 50% 49%,
+    radial-gradient(ellipse 38% 34% at 50% 49%,
       rgba(255, 252, 225, 0.98) 0%,
       rgba(255, 240, 189, 0.9) 24%,
       rgba(255, 220, 140, 0.56) 46%,
       rgba(244, 192, 96, 0.18) 63%,
-      transparent 78%
-    ),
+      transparent 78%),
     linear-gradient(rgba(255, 250, 226, 0.95), rgba(255, 244, 208, 0.95));
   filter: blur(10px);
   transform: scale(0.72);
@@ -141,12 +129,10 @@
   z-index: 0;
   inset: 0;
   background:
-    radial-gradient(
-      ellipse 42% 48% at 50% 50%,
+    radial-gradient(ellipse 42% 48% at 50% 50%,
       rgba(255, 241, 198, 0.58),
       rgba(242, 208, 142, 0.18) 44%,
-      transparent 74%
-    ),
+      transparent 74%),
     linear-gradient(125deg, #24170f 0%, #6e4524 48%, #1c120d 100%);
 }
 
@@ -155,8 +141,7 @@
   inset: -8%;
   content: "";
   opacity: 0.2;
-  background: url("/assets/images/ganesha/ganesha-bg-page.webp") center / cover
-    no-repeat;
+  background: url("/assets/images/ganesha/ganesha-bg-page.webp") center / cover no-repeat;
   filter: blur(22px) saturate(0.7);
 }
 
@@ -184,6 +169,7 @@
   left: 8%;
   animation-delay: -2s;
 }
+
 .ambientParticles span:nth-child(2) {
   top: 76%;
   left: 18%;
@@ -191,6 +177,7 @@
   animation-delay: -8s;
   animation-duration: 16s;
 }
+
 .ambientParticles span:nth-child(3) {
   top: 94%;
   left: 29%;
@@ -198,6 +185,7 @@
   animation-delay: -5s;
   animation-duration: 13s;
 }
+
 .ambientParticles span:nth-child(4) {
   top: 82%;
   left: 39%;
@@ -205,11 +193,13 @@
   animation-delay: -10s;
   animation-duration: 17s;
 }
+
 .ambientParticles span:nth-child(5) {
   top: 92%;
   left: 51%;
   animation-delay: -3s;
 }
+
 .ambientParticles span:nth-child(6) {
   top: 73%;
   left: 62%;
@@ -217,6 +207,7 @@
   animation-delay: -7s;
   animation-duration: 15s;
 }
+
 .ambientParticles span:nth-child(7) {
   top: 91%;
   left: 72%;
@@ -224,6 +215,7 @@
   animation-delay: -11s;
   animation-duration: 14s;
 }
+
 .ambientParticles span:nth-child(8) {
   top: 84%;
   left: 87%;
@@ -231,6 +223,7 @@
   animation-delay: -4s;
   animation-duration: 18s;
 }
+
 .ambientParticles span:nth-child(9) {
   top: 68%;
   left: 5%;
@@ -238,6 +231,7 @@
   animation-delay: -9s;
   animation-duration: 15s;
 }
+
 .ambientParticles span:nth-child(10) {
   top: 79%;
   left: 94%;
@@ -245,6 +239,7 @@
   animation-delay: -6s;
   animation-duration: 13s;
 }
+
 .ambientParticles span:nth-child(11) {
   top: 97%;
   left: 42%;
@@ -252,6 +247,7 @@
   animation-delay: -1s;
   animation-duration: 17s;
 }
+
 .ambientParticles span:nth-child(12) {
   top: 71%;
   left: 77%;
@@ -259,6 +255,7 @@
   animation-delay: -12s;
   animation-duration: 16s;
 }
+
 .ambientParticles span:nth-child(13) {
   top: 86%;
   left: 57%;
@@ -266,6 +263,7 @@
   animation-delay: -8s;
   animation-duration: 14s;
 }
+
 .ambientParticles span:nth-child(14) {
   top: 96%;
   left: 14%;
@@ -273,6 +271,7 @@
   animation-delay: -4s;
   animation-duration: 18s;
 }
+
 .ambientParticles span:nth-child(15) {
   top: 75%;
   left: 46%;
@@ -280,6 +279,7 @@
   animation-delay: -11s;
   animation-duration: 15s;
 }
+
 .ambientParticles span:nth-child(16) {
   top: 90%;
   left: 82%;
@@ -289,15 +289,18 @@
 }
 
 @keyframes particle-drift {
+
   0%,
   100% {
     opacity: 0;
     transform: translate3d(0, 16px, 0) scale(0.75);
   }
+
   18%,
   82% {
     opacity: 0.38;
   }
+
   50% {
     opacity: 0.62;
     transform: translate3d(22px, -72px, 0) scale(1);
@@ -351,13 +354,11 @@
   width: min(88%, 380px);
   aspect-ratio: 1;
   border-radius: 50%;
-  background: radial-gradient(
-    circle,
-    rgba(255, 250, 218, 0.9) 0%,
-    rgba(255, 213, 124, 0.48) 28%,
-    rgba(213, 150, 56, 0.18) 52%,
-    transparent 72%
-  );
+  background: radial-gradient(circle,
+      rgba(255, 250, 218, 0.9) 0%,
+      rgba(255, 213, 124, 0.48) 28%,
+      rgba(213, 150, 56, 0.18) 52%,
+      transparent 72%);
   filter: blur(18px);
   transform: translate(-50%, -50%);
   pointer-events: none;
@@ -390,13 +391,11 @@
   width: min(78%, 360px);
   aspect-ratio: 1;
   border-radius: 50%;
-  background: radial-gradient(
-    circle,
-    rgba(255, 252, 224, 0.72) 0%,
-    rgba(255, 222, 148, 0.38) 28%,
-    rgba(215, 156, 66, 0.13) 54%,
-    transparent 74%
-  );
+  background: radial-gradient(circle,
+      rgba(255, 252, 224, 0.72) 0%,
+      rgba(255, 222, 148, 0.38) 28%,
+      rgba(215, 156, 66, 0.13) 54%,
+      transparent 74%);
   filter: blur(20px);
   mix-blend-mode: screen;
   pointer-events: none;
@@ -410,11 +409,13 @@
 }
 
 @keyframes divine-breath {
+
   0%,
   100% {
     opacity: 0.5;
     transform: translate3d(-50%, -50%, 0) scale(0.97);
   }
+
   50% {
     opacity: 0.94;
     transform: translate3d(-50%, -50%, 0) scale(1.05);
@@ -459,6 +460,7 @@
     opacity: 0;
     transform: translateY(6px);
   }
+
   to {
     opacity: 1;
     transform: translateY(0);
@@ -490,13 +492,6 @@
     box-shadow: none;
   }
 
-  .ganeshaIntro.embedded .invitationPage {
-    width: 100%;
-    height: auto;
-    min-height: 100svh;
-    min-height: 100dvh;
-  }
-
   .pageArtwork {
     object-fit: cover;
   }
@@ -509,6 +504,93 @@
 }
 
 @media (max-width: 760px) {
+  .ganeshaIntro.embedded {
+    --spiritual-inner-gap: clamp(12px, 2.1vh, 18px);
+    --spiritual-block-gap: clamp(22px, 3.6vh, 34px);
+    min-height: 100svh;
+    min-height: 100dvh;
+    overflow: visible;
+  }
+
+  .ganeshaIntro.embedded .invitationPage {
+    justify-content: flex-start;
+    align-items: center;
+    height: auto;
+    max-height: none;
+    min-height: 100svh;
+    min-height: 100dvh;
+    overflow: visible;
+    padding-top: 0;
+    padding-bottom: env(safe-area-inset-bottom, 0px);
+  }
+
+  /* Prayer → Mahavir → Navkar: compact stack, sized to use available height */
+  .ganeshaIntro.embedded .spiritualPanel {
+    display: flex;
+    flex-direction: column;
+    flex: 0 0 auto;
+    align-items: center;
+    justify-content: flex-start;
+    width: min(96%, 26rem);
+    height: auto;
+    max-height: min(82svh, 760px);
+    min-height: min(72svh, 660px);
+    margin: 0 auto;
+    container-type: inline-size;
+    gap: var(--spiritual-block-gap);
+    padding:
+      max(64px, calc(env(safe-area-inset-top, 0px) + 54px)) clamp(10px, 3.5vw, 18px) clamp(12px, 2.5vh, 24px);
+  }
+
+  /* Extra breath between Mahavir image and Navkar (on top of block gap) */
+  .ganeshaIntro.embedded .spiritualPanel> :last-child {
+    margin-top: 6px;
+  }
+
+  .ganeshaIntro.embedded .ganeshaFigureZone {
+    display: flex;
+    flex-direction: column;
+    align-items: center;
+    justify-content: flex-start;
+    width: 100%;
+    height: auto;
+    padding: 0;
+    gap: var(--spiritual-inner-gap);
+  }
+
+  .ganeshaIntro.embedded .ganeshaHalo {
+    top: 62%;
+    width: min(72%, 220px);
+    filter: blur(12px);
+  }
+
+  .ganeshaIntro.embedded .ganeshaPrayer {
+    position: relative;
+    z-index: 6;
+    order: 1;
+    margin: 0 0 clamp(6px, 1.1vh, 14px);
+    font-size: clamp(0.92rem, 4.1cqw, 1.2rem);
+    line-height: 1.2;
+  }
+
+  .ganeshaIntro.embedded .ganeshaArtworkWrap {
+    order: 2;
+    flex: none;
+    width: min(58vw, 292px);
+    max-height: min(42svh, 340px);
+    display: block;
+    margin-inline: auto;
+  }
+
+  .ganeshaIntro.embedded .ganeshaArtwork {
+    display: block;
+    width: 100%;
+    max-width: 100%;
+    max-height: min(42svh, 340px);
+    height: auto;
+    object-fit: contain;
+  }
+
   .ambientParticles span {
     animation: none;
   }
@@ -554,16 +636,19 @@
 }
 
 @media (prefers-reduced-motion: reduce) {
+
   .invitationPage,
   .ganeshaHalo,
   .ganeshaArtworkWrap {
     will-change: auto;
   }
+
   .ambientParticles span,
   .divineLightLive,
   .ganeshaPrayer {
     animation: none;
   }
+
   .divineLightLive {
     opacity: 0.78;
   }
