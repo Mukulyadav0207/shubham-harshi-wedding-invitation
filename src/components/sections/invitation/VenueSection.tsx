@@ -40,8 +40,10 @@ export default function VenueSection({
       aria-labelledby="venue-section-title"
     >
       <header className={styles.header}>
-        <p>Where We Celebrate</p>
-        <h2 id="venue-section-title">One Venue, A Lifetime of Togetherness</h2>
+        <p>THE BEGINNING OF OUR ALWAYS</p>
+        <h2 id="venue-section-title">Somewhere Between Destiny & Us</h2>
+        <p>One little story, two hearts, and a forever to unfold</p>
+
         <span aria-hidden="true">✦</span>
       </header>
       <div className={styles.journey}>

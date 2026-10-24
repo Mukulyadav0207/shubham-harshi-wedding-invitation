@@ -16,9 +16,9 @@ export const venues: readonly Venue[] = [
   {
     id: 1,
     type: 'celebration-venue',
-    label: 'Celebration Venue',
+    label: 'Our Wedding Celebrations',
     date: '20 – 21 November 2026',
-    time: 'Haldi through Reception',
+    time: 'Two Days of Love, Laughter & Forever',
     name: 'The Crown Palace',
     address: 'Makronia Rd, Sagar, MP 470002',
     image: '/assets/images/venues/crown-palace.webp',

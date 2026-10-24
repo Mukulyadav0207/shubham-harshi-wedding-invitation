@@ -184,7 +184,6 @@
   display: grid;
   justify-items: center;
   text-align: center;
-  translate: var(--parallax-near-x, 0px) var(--parallax-near-y, 0px);
 }
 
 .copy > * {
@@ -200,14 +199,32 @@
 .copy .intro {
   animation-delay: 0.3s;
 }
-.copy h1.name {
+.copy .namesGroup {
+  opacity: 1;
+  transform: none;
+  animation: none;
+  will-change: auto;
+}
+
+.namesGroup > * {
+  opacity: 0;
+  transform: translate3d(0, 22px, 0);
+  animation: copy-in 0.76s both cubic-bezier(0.22, 0.8, 0.28, 1);
+}
+
+.copy .namesGroup h1.name {
   animation: hero-name-in 0.9s 0.46s both cubic-bezier(0.22, 0.8, 0.28, 1);
+  will-change: auto;
 }
-.copy .with {
-  animation-delay: 0.6s;
+
+.copy .namesGroup .with {
+  animation: copy-in 0.76s 0.6s both cubic-bezier(0.22, 0.8, 0.28, 1);
+  will-change: auto;
 }
-.copy p.name {
+
+.copy .namesGroup p.name {
   animation: hero-name-in 0.9s 0.74s both cubic-bezier(0.22, 0.8, 0.28, 1);
+  will-change: auto;
 }
 
 .ornament {
@@ -241,25 +258,71 @@
   font-weight: 600;
 }
 
-.name {
-  color: #782d42;
-  font-family: var(--font-great-vibes), "Brush Script MT", cursive;
-  font-size: clamp(4.5rem, 7.2vw, 7.6rem);
-  font-weight: 400;
-  font-style: normal;
-  line-height: 0.75;
-  letter-spacing: -0.025em;
+.namesGroup {
+  position: relative;
+  margin-top: 6px;
+  padding: clamp(14px, 2.8vw, 22px) clamp(10px, 3vw, 18px) clamp(10px, 2vw, 16px);
 }
 
-.intro + .name {
-  margin-top: 8px;
+.namesGroup::before {
+  position: absolute;
+  top: 50%;
+  left: 50%;
+  color: rgba(170, 122, 98, 0.22);
+  font-size: clamp(3.5rem, 8vw, 5.5rem);
+  line-height: 1;
+  transform: translate(-50%, -54%);
+  content: "✦";
+  pointer-events: none;
+}
+
+.name {
+  position: relative;
+  z-index: 1;
+  margin: 0;
+  color: #6b2840;
+  font-family: var(--font-great-vibes), "Brush Script MT", cursive;
+  font-size: clamp(3.85rem, 6.8vw, 5.35rem);
+  font-weight: 400;
+  font-style: normal;
+  line-height: 0.94;
+  letter-spacing: 0;
+  -webkit-text-stroke: 0.25px rgba(107, 40, 64, 0.22);
+  paint-order: stroke fill;
+  text-shadow:
+    0 2px 0 rgba(255, 250, 247, 0.35),
+    0 16px 34px rgba(107, 40, 64, 0.16);
+  -webkit-font-smoothing: antialiased;
+  text-rendering: optimizeLegibility;
 }
 
 .with {
-  margin: 14px 0 25px;
+  position: relative;
+  z-index: 1;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  gap: clamp(10px, 2vw, 16px);
+  margin: 4px 0 8px;
   color: #8d5363;
-  font-size: clamp(1.25rem, 2vw, 1.8rem);
-  font-style: italic;
+  font-family: var(--font-great-vibes), "Brush Script MT", cursive;
+  font-size: clamp(1.75rem, 3.2vw, 2.35rem);
+  font-weight: 400;
+  line-height: 1;
+  letter-spacing: 0.08em;
+}
+
+.with::before,
+.with::after {
+  display: block;
+  width: clamp(40px, 9vw, 64px);
+  height: 1px;
+  background: linear-gradient(90deg, transparent, rgba(196, 168, 118, 0.95));
+  content: "";
+}
+
+.with::after {
+  transform: scaleX(-1);
 }
 
 .scratchCard {
@@ -654,7 +717,7 @@
   height: 90%;
   border-radius: inherit;
   object-fit: cover;
-  /* object-position: center 22%; */
+  object-position: center 130%;
   translate: var(--parallax-near-x, 0px) var(--parallax-near-y, 0px);
   transition: translate 0.45s ease-out;
 }
@@ -786,7 +849,7 @@
 @keyframes hero-name-in {
   from {
     opacity: 0;
-    transform: translate3d(0, 26px, 0) scale(0.985);
+    transform: translate3d(0, 22px, 0);
   }
   to {
     opacity: 1;
@@ -1001,6 +1064,7 @@
   }
 
   .copy > *,
+  .namesGroup > *,
   .revealed .revealDetails > *,
   .countdown > * {
     opacity: 1;

@@ -12,6 +12,12 @@ const siteUrl =
   process.env.URL ??
   "https://shubham-harshi-wedding-invitation.netlify.app";
 
+/** Bump when replacing public/og-image.png (then run scripts/optimize-og-image.py). */
+const OG_IMAGE_VERSION = "20261022";
+const OG_IMAGE_WIDTH = 1200;
+const OG_IMAGE_HEIGHT = 540;
+const OG_IMAGE_PATH = `/og-image.webp?v=${OG_IMAGE_VERSION}`;
+
 export const metadata: Metadata = {
   metadataBase: new URL(siteUrl),
   title: "Shubham & Harshi · Wedding Invitation",
@@ -37,9 +43,9 @@ export const metadata: Metadata = {
       "You're warmly invited to celebrate with us — 21 November 2026. #shushi",
     images: [
       {
-        url: "/og-image.webp",
-        width: 1870,
-        height: 841,
+        url: OG_IMAGE_PATH,
+        width: OG_IMAGE_WIDTH,
+        height: OG_IMAGE_HEIGHT,
         alt: "Shubham and Harshi's wedding invitation for 21 November 2026",
         type: "image/webp",
       },
@@ -52,7 +58,7 @@ export const metadata: Metadata = {
       "You're warmly invited to celebrate with us — 21 November 2026. #shushi",
     images: [
       {
-        url: "/og-image.webp",
+        url: OG_IMAGE_PATH,
         alt: "Shubham and Harshi's wedding invitation for 21 November 2026",
       },
     ],

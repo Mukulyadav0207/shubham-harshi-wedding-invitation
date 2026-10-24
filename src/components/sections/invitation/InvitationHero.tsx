@@ -990,17 +990,19 @@ export default function InvitationHero({
             We cordially invite you to witness the beginning of our forever and
             celebrate the wedding ceremony of
           </p>
-          <h1 className={styles.name}>Shubham</h1>
-          <p className={styles.with}>weds</p>
-          <p className={styles.name}>Harshi</p>
+          <div className={styles.namesGroup}>
+            <h1 className={styles.name}>Shubham</h1>
+            <p className={styles.with}>weds</p>
+            <p className={styles.name}>Harshi</p>
+          </div>
         </div>
         <div ref={visualRef} className={styles.visual}>
           <figure className={styles.portrait}>
             <Image
               className={styles.couplePhoto}
               src="/assets/images/bg/sh-photo.webp"
-              width={1086}
-              height={1448}
+              width={1400}
+              height={2099}
               alt="Shubham and Harshi"
               priority
               sizes="(max-width: 760px) min(340px, 100vw), 420px"

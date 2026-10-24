@@ -45,7 +45,7 @@ export const familyIntro = {
     right: "H",
   },
   footer: {
-    lines: ["Raised with love,", "United by destiny,"],
+    lines: ["SOMEHOW, WE FOUND EACH OTHER. SOMEHOW, IT WAS ALWAYS US"],
     script: "together, forever",
   },
 } satisfies {
