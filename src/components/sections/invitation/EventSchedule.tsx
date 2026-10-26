@@ -64,9 +64,9 @@ export const events: readonly WeddingEvent[] = [
     image: '/assets/images/events/pheras.webp',
   },
   {
-    title: 'Reception',
+    title: 'Barat & Reception',
     date: '21 November 2026',
-    times: ['5:00 pM'],
+    times: ['5:00 PM'],
     venue: 'The Crown Palace',
     location: 'Makronia Rd, Sagar, MP 470002',
     image: '/assets/images/events/reception.webp',

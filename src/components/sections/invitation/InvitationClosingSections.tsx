@@ -156,14 +156,15 @@ export function FamilyLoveSection() {
             <span className={styles.familySeparator} aria-hidden="true" />
             <p className={styles.familySiblingLabel}>{groom.siblingLabel}</p>
             <p className={styles.familySiblings}>{groom.siblings}</p>
-            {groom.extraRelationLabel && groom.extraRelation ? (
-              <>
-                <p className={styles.familySiblingLabel}>
-                  {groom.extraRelationLabel}
-                </p>
-                <p className={styles.familySiblings}>{groom.extraRelation}</p>
-              </>
-            ) : null}
+            {groom.relationSections?.map((section) => (
+              <div key={section.label}>
+                <p className={styles.familySiblingLabel}>{section.label}</p>
+                <FamilyDetailText
+                  className={styles.familySiblings}
+                  text={section.names}
+                />
+              </div>
+            ))}
           </article>
 
           <div

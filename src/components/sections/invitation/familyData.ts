@@ -1,3 +1,8 @@
+export type FamilyRelationSection = {
+  label: string;
+  names: string | readonly string[];
+};
+
 export type FamilyMember = {
   name: string;
   grandparentsLabel: "Grand son of" | "Grand daughter of";
@@ -6,8 +11,7 @@ export type FamilyMember = {
   parents: string;
   siblingLabel: string;
   siblings: string;
-  extraRelationLabel?: string;
-  extraRelation?: string;
+  relationSections?: readonly FamilyRelationSection[];
 };
 
 export const familyIntro = {
@@ -25,8 +29,19 @@ export const familyIntro = {
     parents: "Shri Rajesh & Sunita",
     siblingLabel: "Brother & Sister in law",
     siblings: "Rishabh & Shweta",
-    extraRelationLabel: "Our little niece",
-    extraRelation: "Shrisha",
+    relationSections: [
+      { label: "Taiji", names: "Shri Madhu ji" },
+      {
+        label: "Cousin & cousin-in-law",
+        names: ["Ankur & Meenu", "Ankit & Shilpi"],
+      },
+      {
+        label: "Cousin's son & daughter",
+        names:
+          "Aditi, Apeksha, Devesh, Atisha, Unnati & Utkarsh",
+      },
+      { label: "Our little niece", names: "Shrisha" },
+    ],
   },
   bride: {
     name: "Harshi",
