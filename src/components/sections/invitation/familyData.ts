@@ -22,23 +22,23 @@ export const familyIntro = {
     name: "Shubham",
     grandparentsLabel: "Grand son of",
     grandparents: [
-      "Late Bhagwat Prasad Ji &",
-      "Late Jaivanti Devi Ji",
+      "Late Bhagwat Prasad &",
+      "Late Jaivanti Devi Jain",
     ],
     parentsLabel: "Son of",
-    parents: "Shri Rajesh & Sunita",
+    parents: "Shri Rajesh & Sunita Jain",
     siblingLabel: "Brother & Sister in law",
-    siblings: "Rishabh & Shweta",
+    siblings: "Rishabh & Shweta Jain",
     relationSections: [
-      { label: "Taiji", names: "Shri Madhu ji" },
+      { label: "Taiji", names: "Shri Madhu Jain" },
       {
         label: "Cousin & cousin-in-law",
-        names: ["Ankur & Meenu", "Ankit & Shilpi"],
+        names: ["Ankur & Meenu Jain", "Ankit & Shilpi Jain"],
       },
       {
         label: "Cousin's son & daughter",
         names:
-          "Aditi, Apeksha, Devesh, Atisha, Unnati & Utkarsh",
+          "Aditi, Apeksha, Devesh, Atisha, Unnati & Utkarsh Jain",
       },
       { label: "Our little niece", names: "Shrisha" },
     ],
@@ -47,13 +47,13 @@ export const familyIntro = {
     name: "Harshi",
     grandparentsLabel: "Grand daughter of",
     grandparents: [
-      "Late Prakash Chand Ji &",
-      "Late Basant Rani Ji",
+      "Late Prakash Chand &",
+      "Late Basant Rani Ch (Jain)",
     ],
     parentsLabel: "Daughter of",
-    parents: "Shri Rahul & Rajul",
+    parents: "Shri Rahul & Rajul Ch (Jain)",
     siblingLabel: "Sister of",
-    siblings: "Harshit",
+    siblings: "Harshit Chaudhary (Jain)",
   },
   monogram: {
     left: "S",
