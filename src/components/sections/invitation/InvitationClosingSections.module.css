@@ -489,8 +489,16 @@ transform: rotate(22deg);
   max-width: min(26rem, 100%);
 }
 
-.familySiblingLabel {
-  margin-top: clamp(10px, 1.8vw, 16px);
+.familyRelationsStack {
+  display: flex;
+  flex-direction: column;
+  gap: clamp(10px, 1.8vw, 16px);
+}
+
+.familyRelationGroup {
+  display: flex;
+  flex-direction: column;
+  gap: clamp(5px, 0.9vw, 9px);
 }
 
 .familyBlockGroom {
@@ -513,6 +521,7 @@ transform: rotate(22deg);
 }
 
 .familyGrandparentsLabel,
+.familyRelation,
 .familySiblingLabel {
   margin: 0;
   color: #b8945f;
@@ -522,18 +531,6 @@ transform: rotate(22deg);
   font-weight: 600;
   letter-spacing: 0.22em;
   text-transform: uppercase;
-}
-
-.familyRelation {
-  margin: 0;
-  margin-top: clamp(8px, 1.4vw, 12px);
-  color: #b8945f;
-  font-family: Georgia, "Times New Roman", serif;
-  font-size: clamp(0.58rem, 1vw, 0.68rem);
-  font-style: normal;
-  font-weight: 600;
-  letter-spacing: 0.22em;
-  text-transform: none;
 }
 
 .familyParents,
@@ -571,7 +568,7 @@ transform: rotate(22deg);
   display: block;
   width: clamp(28px, 4vw, 44px);
   height: 1px;
-  margin: clamp(4px, 0.8vw, 8px) 0;
+  margin: 0;
   background: linear-gradient(
     90deg,
     transparent,
@@ -1206,30 +1203,19 @@ transform: rotate(22deg);
   }
 
   .familyGrandparentsLabel,
+  .familyRelation,
   .familySiblingLabel {
-    font-size: clamp(0.46rem, 2.1vw, 0.54rem);
-    letter-spacing: 0.07em;
-    line-height: 1.35;
-  }
-
-  .familyRelation {
     font-size: clamp(0.46rem, 2.1vw, 0.54rem);
     letter-spacing: 0.09em;
     line-height: 1.35;
-    text-transform: none;
   }
 
-  .familyGrandparentsLabel,
-  .familySiblingLabel {
-    letter-spacing: 0.09em;
+  .familyRelationsStack {
+    gap: clamp(9px, 2.4vw, 13px);
   }
 
-  .familyRelation {
-    margin-top: clamp(7px, 2vw, 10px);
-  }
-
-  .familySiblingLabel {
-    margin-top: clamp(9px, 2.4vw, 13px);
+  .familyRelationGroup {
+    gap: clamp(4px, 1.2vw, 7px);
   }
 
   .familyParents,
@@ -1243,7 +1229,7 @@ transform: rotate(22deg);
 
   .familySeparator {
     width: clamp(22px, 8vw, 32px);
-    margin: clamp(4px, 1.2vw, 7px) 0;
+    margin: 0;
   }
 
   .familyMonogram {

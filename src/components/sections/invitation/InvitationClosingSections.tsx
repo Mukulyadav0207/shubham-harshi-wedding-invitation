@@ -144,27 +144,37 @@ export function FamilyLoveSection() {
             className={`${styles.familyBlock} ${styles.familyBlockGroom}`}
           >
             <p className={styles.familyName}>{groom.name}</p>
-            <p className={styles.familyGrandparentsLabel}>
-              {groom.grandparentsLabel}
-            </p>
-            <FamilyDetailText
-              className={styles.familyParents}
-              text={groom.grandparents}
-            />
-            <p className={styles.familyRelation}>{groom.parentsLabel}</p>
-            <p className={styles.familyParents}>{groom.parents}</p>
-            <span className={styles.familySeparator} aria-hidden="true" />
-            <p className={styles.familySiblingLabel}>{groom.siblingLabel}</p>
-            <p className={styles.familySiblings}>{groom.siblings}</p>
-            {groom.relationSections?.map((section) => (
-              <div key={section.label}>
-                <p className={styles.familySiblingLabel}>{section.label}</p>
+            <div className={styles.familyRelationsStack}>
+              <div className={styles.familyRelationGroup}>
+                <p className={styles.familyGrandparentsLabel}>
+                  {groom.grandparentsLabel}
+                </p>
                 <FamilyDetailText
-                  className={styles.familySiblings}
-                  text={section.names}
+                  className={styles.familyParents}
+                  text={groom.grandparents}
                 />
               </div>
-            ))}
+              <div className={styles.familyRelationGroup}>
+                <p className={styles.familyRelation}>{groom.parentsLabel}</p>
+                <p className={styles.familyParents}>{groom.parents}</p>
+              </div>
+              <span className={styles.familySeparator} aria-hidden="true" />
+              <div className={styles.familyRelationGroup}>
+                <p className={styles.familySiblingLabel}>
+                  {groom.siblingLabel}
+                </p>
+                <p className={styles.familySiblings}>{groom.siblings}</p>
+              </div>
+              {groom.relationSections?.map((section) => (
+                <div key={section.label} className={styles.familyRelationGroup}>
+                  <p className={styles.familySiblingLabel}>{section.label}</p>
+                  <FamilyDetailText
+                    className={styles.familySiblings}
+                    text={section.names}
+                  />
+                </div>
+              ))}
+            </div>
           </article>
 
           <div
@@ -197,18 +207,28 @@ export function FamilyLoveSection() {
             className={`${styles.familyBlock} ${styles.familyBlockBride}`}
           >
             <p className={styles.familyName}>{bride.name}</p>
-            <p className={styles.familyGrandparentsLabel}>
-              {bride.grandparentsLabel}
-            </p>
-            <FamilyDetailText
-              className={styles.familyParents}
-              text={bride.grandparents}
-            />
-            <p className={styles.familyRelation}>{bride.parentsLabel}</p>
-            <p className={styles.familyParents}>{bride.parents}</p>
-            <span className={styles.familySeparator} aria-hidden="true" />
-            <p className={styles.familySiblingLabel}>{bride.siblingLabel}</p>
-            <p className={styles.familySiblings}>{bride.siblings}</p>
+            <div className={styles.familyRelationsStack}>
+              <div className={styles.familyRelationGroup}>
+                <p className={styles.familyGrandparentsLabel}>
+                  {bride.grandparentsLabel}
+                </p>
+                <FamilyDetailText
+                  className={styles.familyParents}
+                  text={bride.grandparents}
+                />
+              </div>
+              <div className={styles.familyRelationGroup}>
+                <p className={styles.familyRelation}>{bride.parentsLabel}</p>
+                <p className={styles.familyParents}>{bride.parents}</p>
+              </div>
+              <span className={styles.familySeparator} aria-hidden="true" />
+              <div className={styles.familyRelationGroup}>
+                <p className={styles.familySiblingLabel}>
+                  {bride.siblingLabel}
+                </p>
+                <p className={styles.familySiblings}>{bride.siblings}</p>
+              </div>
+            </div>
           </article>
         </div>
 
