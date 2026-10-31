@@ -30,7 +30,7 @@ export const familyIntro = {
     siblingLabel: "Brother & Sister in law",
     siblings: "Rishabh & Shweta Jain",
     relationSections: [
-      { label: "Taiji", names: "Shri Madhu Jain" },
+      { label: "Tauji & Taiji", names: "Late Shri Rakesh & Shrimati Madhu Jain" },
       {
         label: "Cousin & cousin-in-law",
         names: ["Ankur & Meenu Jain", "Ankit & Shilpi Jain"],
